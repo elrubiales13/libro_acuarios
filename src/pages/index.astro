@@ -136,13 +136,13 @@ const PUBLIC_SUPABASE_BUCKET = import.meta.env.PUBLIC_SUPABASE_BUCKET ?? "";
 	<!-- Navegación -->
 	<nav slot="nav" class="book-nav">
 		{pageIndex > 0 && (
-			<a class="prev" href={`?p=${pageIndex - 1}`} data-astro-reload>
+			<a class="prev" href={`/libro_acuarios/?p=${pageIndex - 1}`} data-astro-reload>
 			← Anterior
 			</a>
 		)}
 
 		{pageIndex < fishes.length && (
-			<a class="next" href={`?p=${pageIndex + 1}`} data-astro-reload>
+			<a class="next" href={`/libro_acuarios/?p=${pageIndex + 1}`} data-astro-reload>
 			Siguiente →
 			</a>
 		)}
@@ -272,7 +272,7 @@ const PUBLIC_SUPABASE_BUCKET = import.meta.env.PUBLIC_SUPABASE_BUCKET ?? "";
 				// Toggle floating actions
 				if (fabToggle) fabToggle.addEventListener('click', (ev) => { ev.stopPropagation(); const fab = fabToggle.closest('.fab'); if (fab) fab.classList.toggle('open'); });
 				if (cancelBtn) cancelBtn.addEventListener("click", (ev) => { ev.preventDefault(); ev.stopPropagation(); closeModal(); });
-				if (waterLevelsBtn) waterLevelsBtn.addEventListener('click', (ev) => { ev.stopPropagation(); window.location.href = '/water-levels'; });
+				if (waterLevelsBtn) waterLevelsBtn.addEventListener('click', (ev) => { ev.stopPropagation(); window.location.href = '/libro_acuarios/water-levels'; });
 				
 				// Helper to attach click handler to the "Añadir foto" button in the image page
 				const setupAddPhotoBtn = () => {
