@@ -1,0 +1,124 @@
+---
+const { title = "Libro de Acuarios" } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <script>
+    try {
+      if (localStorage.getItem('bookOpened') === 'true') {
+        document.documentElement.classList.add('book-opened');
+      }
+    } catch (e) {
+      // ignore (e.g. SSR or privacy-restricted contexts)
+    }
+  </script>
+  <link rel="stylesheet" href="/styles/book.css" />
+</head>
+
+<body>
+
+  <main class="book-container">
+
+    <!-- PORTADA -->
+    <section class="book-cover" id="book-cover">
+      <div class="cover-content">
+        <h1>{title}</h1>
+        <p>Libro de control y seguimiento de acuarios</p>
+        <button class="open-book-btn">Abrir libro</button>
+      </div>
+    </section>
+
+    <!-- LIBRO -->
+    <section class="book is-hidden" id="book">
+      <div class="page left">
+        <slot name="left" />
+      </div>
+      <div class="book-spine"></div>
+      <div class="page right">
+        <slot name="right" />
+      </div>
+    </section>
+
+  </main>
+  <!-- Navegación del libro -->
+  <div id="book-nav">
+    <slot name="nav" />
+  </div>
+  <!-- UI flotante, modales y scripts --> 
+  <slot name="ui" />
+
+</body>
+</html>
+<script>
+  const cover = document.getElementById('book-cover');
+  const book = document.getElementById('book');
+  const btn = document.querySelector('.open-book-btn');
+  const navContainer = document.getElementById('book-nav');
+
+  const alreadyOpened = localStorage.getItem('bookOpened') === 'true';
+
+  if (alreadyOpened) {
+    cover?.classList.add('is-hidden');
+    book?.classList.remove('is-hidden');
+    book?.classList.add('is-visible');
+    if (navContainer) navContainer.style.display = 'block';
+  }
+
+  btn?.addEventListener('click', () => {
+    cover?.classList.add('is-hidden');
+    book?.classList.remove('is-hidden');
+    book?.classList.add('is-visible');
+    if (navContainer) navContainer.style.display = 'block';
+    try { document.documentElement.classList.add('book-opened'); } catch (e) {}
+    localStorage.setItem('bookOpened', 'true');
+  });
+
+  const closeLink = document.createElement('a');
+  closeLink.href = '#';
+  closeLink.textContent = 'Cerrar libro';
+  closeLink.classList.add('close-book-link');
+  closeLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    book?.classList.add('is-hidden');
+    book?.classList.remove('is-visible');
+    cover?.classList.remove('is-hidden');
+    if (navContainer) navContainer.style.display = 'none';
+    try { document.documentElement.classList.remove('book-opened'); } catch (e) {}
+    localStorage.setItem('bookOpened', 'false');
+  });
+
+  // Introduce el enlace de cerrar libro dentro de #book-nav, debajo de los botones
+  if (navContainer) {
+    navContainer.appendChild(closeLink);
+  } else {
+    // fallback: append to body
+    document.body.appendChild(closeLink);
+  }
+
+
+  if (alreadyOpened) {
+    closeLink.style.display = 'block';
+    if (navContainer) navContainer.style.display = 'block';
+  } else {
+    closeLink.style.display = 'none';
+    if (navContainer) navContainer.style.display = 'none';
+  }
+
+  // Show/hide close button based on book state
+  const observer = new MutationObserver(() => {
+    if (book?.classList.contains('is-visible')) {
+      closeLink.style.display = 'block';
+      if (navContainer) navContainer.style.display = 'block';
+    } else {
+      closeLink.style.display = 'none';
+      if (navContainer) navContainer.style.display = 'none';
+    }
+  });
+  if (book) observer.observe(book, { attributes: true, attributeFilter: ['class'] });
+
+</script>
+

@@ -1,0 +1,1254 @@
+---
+import FullPageLayout from "../layouts/FullPageLayout.astro";
+export const prerender = false;
+
+const PUBLIC_SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+---
+
+<FullPageLayout title="Niveles de agua">
+  <form id="water-form" class="water-form">
+    <label>
+      Fecha
+      <input type="date" name="date" required />
+    </label>
+
+    
+    <label>
+      Temperatura (°C)
+      <input type="number" step="0.1" name="temperature" />
+    </label>
+
+    <label>
+      pH
+      <input type="number" step="0.1" name="ph" />
+    </label>
+
+    <label>
+      GH
+      <input type="number" step="0.1" name="gh" />
+    </label>
+
+    <label>
+      KH
+      <input type="number" step="0.1" name="kh" />
+    </label>
+
+    <label>
+      Nitratos NO3 (mg/L)
+      <input type="number" step="0.1" name="nitratos" />
+    </label>
+
+    <label>
+      Nitritos NO2 (mg/L)
+      <input type="number" step="0.1" name="nitritos" />
+    </label>
+
+    <label>
+      Amoniaco NH3-NH4 (mg/L)
+      <input type="number" step="0.1" name="amoniaco" />
+    </label>
+
+    <label>
+      PO4 (mg/L)
+      <input type="number" step="0.01" name="po" />
+    </label>
+
+    <label>
+      Cloro
+      <input type="number" step="0.1" name="cl" />
+    </label>
+
+    <label>
+      Hierro
+      <input type="number" step="0.1" name="hierro" />
+    </label>
+
+    <label>
+      Notas
+      <textarea name="notes"></textarea>
+    </label>
+
+    <button type="submit">Guardar registro</button>
+  </form>
+
+  <form id="tank-form" class="tank-form">
+    <label>
+      Nombre del acuario
+      <input name="name" required placeholder="Acuario 300L" />
+    </label>
+
+    <label>
+      Volumen (litros)
+      <input type="number" name="volume_l" />
+    </label>
+
+    <button type="submit">Crear acuario</button>
+  </form>
+
+
+  <div class="water-levels" data-index="0">
+    <header class="wl-header">
+      
+      <div class="wl-add-btn">
+        <h1>Niveles del agua</h1>
+        
+        <button id="add-reg" type="button" title="Añadir valores">＋</button>
+        <button id="add-tank" type="button" title="Añadir acuario" class="icon-btn add-aquarium-btn"></button>
+      </div>
+    </header>
+
+
+    <div class="wl-nav-floating">
+      <button id="prev-tank" class="nav-btn left">‹</button>
+      <button id="next-tank" class="nav-btn right">›</button>
+    </div>
+
+    <div class="carousel">
+      <div class="carousel-track" id="tank-track">
+        <!-- Secciones de acuarios se insertan aquí -->
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="water-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-wrapper">
+    <nav class="book-nav">
+      <a href="/" data-astro-reload>← Volver</a>
+    </nav>
+  </div>
+
+</FullPageLayout>
+<div
+  id="supabase-config"
+  data-url={PUBLIC_SUPABASE_URL}
+  data-key={PUBLIC_SUPABASE_ANON_KEY}
+  style="display:none">
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  const cfg = document.getElementById('supabase-config');
+
+  const supabase = createClient(
+    cfg.dataset.url,
+    cfg.dataset.key
+  );
+  let tanksData = [];
+  let index = 0;
+
+
+  const root = document.querySelector('.water-levels');
+  const track = document.querySelector('.carousel-track');
+  const tanks = Array.from(document.querySelectorAll('.tank'));
+  const prevBtn = document.getElementById('prev-tank');
+  const nextBtn = document.getElementById('next-tank');
+  const tankThresholds = new Map();
+ 
+  //Objeto para definir los rangos de alerta por parámetros fijos.
+  const ALERT_RANGES = {
+    nitratos: {
+      evaluate: v => {
+        if (v <= 40) return { status: 'ok' };
+        if (v <= 50) return { status: 'warning', msg: 'Nitratos elevados' };
+        return { status: 'danger', msg: 'Nitratos peligrosos, cambio de agua' };
+      }
+    },
+
+    nitritos: {
+      evaluate: v => {
+        if (v === 0) return { status: 'ok' };
+        if (v <= 0.5) return { status: 'ok', msg: 'Inocua pero requiere revisión.' };
+        if (v <= 1.0) return { status: 'warning', msg: 'Perjudicial, realice un cambio de agua.' };
+        if (v <= 2.0) return { status: 'danger', msg: 'Peligrosa, posible tratamiento + cambio de agua.' };
+        return { status: 'danger', msg: 'Tóxica, trate el agua y realice un cambio de agua inmediato.' };
+      }
+    },
+
+    po: {
+      evaluate: v => {
+        if (v <= 1) return { status: 'ok' };
+        if (v <= 10) return { status: 'warning', msg: 'Posible crecimiento de algas' };
+        return { status: 'danger', msg: 'Crecimiento de algas, cambio de agua' };
+      }
+    },
+
+    cl: {
+      evaluate: v => {
+        if (v === 0) return { status: 'ok' };
+        return { status: 'danger', msg: 'Cloro detectado, agua tóxica' };
+      }
+    },
+
+    hierro: {
+      evaluate: v => {
+        if (v === 0) return { status: 'danger', msg: 'Agua nociva para las plantas, abone de inmediato.' };
+        if (v < 0.25) return { status: 'warning', msg: 'Escasa presencia de nutrientes, abone durante 3 días.' };
+        if (v <= 0.5) return { status: 'ok', msg: 'Valor ideal para las plantas.' };
+        return { status: 'danger', msg: 'Hierro excesivo, peligroso para los peces, realice un cambio de agua.' };
+      }
+    }
+  };
+
+  //Funciones para calcular el amoniaco tóxico NH3 a partir del amonio NH4 y el pH.
+
+  function evaluateAmmonia(nh4, ph) {
+    const nh3 = calculateNH3(nh4, ph);
+    if (nh3 == null) return null;
+
+    if (nh3 >= 0.2) return { status: 'danger', msg: 'Muy tóxico, acción inmediata' };
+    if (nh3 >= 0.05) return { status: 'danger', msg: 'Tóxico, cambio de agua' };
+    if (nh3 >= 0.02) return { status: 'warning', msg: 'Estrés leve, vigilar' };
+
+    return { status: 'ok' };
+  }
+
+  function calculatePka(tempC) {
+    if (tempC === null || tempC === undefined) return null;
+    return 0.09018 + (2729.92 / (tempC + 273.15));
+  }
+
+  function calculateNH3(totalAmmonia, ph, tempC) {
+    if (
+      totalAmmonia === null || ph === null || tempC === null ||
+      totalAmmonia === undefined || ph === undefined || tempC === undefined
+    ) {
+      return null;
+    }
+
+    const pKa = calculatePka(tempC);
+    const fraction = 1 / (1 + Math.pow(10, pKa - ph));
+
+    return totalAmmonia * fraction;
+  }
+  // Fin funciones amoniaco
+
+  //Definir los colores para los rangos de alerta de la tabla (son valores por defecto)
+  function getAlertLevel(value, { min, max } = {}) {
+    if (value === null || value === undefined || value === '') return '';
+
+    const num = Number(value);
+    if (Number.isNaN(num)) return '';
+
+    if (min !== undefined && num < min) return 'danger';
+    if (max !== undefined && num > max) return 'danger';
+
+    return 'ok';
+  }
+			
+			
+
+  //Cargar datos de alerta
+  async function loadTankThresholds(tankId) {
+    if (tankThresholds.has(tankId)) {
+      return tankThresholds.get(tankId);
+    }
+
+    const { data, error } = await supabase
+      .from('tank_thresholds')
+      .select('*')
+      .eq('tank_id', tankId)
+      .maybeSingle(); // 👈 CLAVE
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    // Puede ser null si aún no hay rangos
+    tankThresholds.set(tankId, data);
+    return data;
+  }
+
+
+  //Evaluar niveles segun las alertas
+  function evaluate(value, min, max) {
+    if (value === null || value === undefined) return 'neutral';
+
+    if (min !== null && value < min) return 'danger';
+    if (max !== null && value > max) return 'danger';
+
+    return 'ok';
+  }
+
+  //helpel para crear campos de rangos
+  function thresholdField(key, label) {
+    return `
+      <label>
+        ${label}
+        <div class="range">
+          <input type="number" step="0.1" name="${key}_min" placeholder="min">
+          <span>—</span>
+          <input type="number" step="0.1" name="${key}_max" placeholder="max">
+        </div>
+      </label>
+    `;
+  }
+
+  function update() {
+    track.style.transform = `translateX(-${index * 100}%)`;
+    loadTankData();
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (index > 0) {
+      index--;
+      update();
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (index < tanksData.length - 1) {
+      index++;
+      update();
+    }
+  });
+
+  // Script para insertar datos en la tabla y graficas
+  const form = document.getElementById('water-form');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fd = new FormData(form);
+    const tankId = tanksData[index].id;
+
+    const payload = {
+      date: fd.get('date'),
+      tank_id: tankId,
+      temperature: fd.get('temperature') || null,
+      ph: fd.get('ph') || null,
+      gh: fd.get('gh') || null,
+      kh: fd.get('kh') || null,
+      nitratos: fd.get('nitratos') || null,
+      nitritos: fd.get('nitritos') || null,
+      amoniaco: fd.get('amoniaco') || null,
+      po: fd.get('po') || null,
+      cl: fd.get('cl') || null,
+      hierro: fd.get('hierro') || null,
+      notes: fd.get('notes') || null
+    };
+
+    const { error } = await supabase
+      .from('water_levels')
+      .insert(payload);
+    if (!error) {
+      const tankId = tanksData[index].id;
+      const tankSection = document.querySelectorAll('.tank')[index];
+      loadLastMeasurement(tankId, tankSection);
+    }
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    form.reset();
+    form.classList.remove('is-open');
+
+    // recargar SOLO si coincide con el acuario visible
+    if (payload.tank === tanks[index].dataset.tank) {
+      loadTankData(payload.tank);
+    }
+  });
+
+  // Botón para mostrar/ocultar formulario
+  const addBtn = document.getElementById('add-reg');
+  addBtn.addEventListener('click', () => {
+    form.classList.toggle('is-open');
+
+    if (form.classList.contains('is-open')) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+
+  // Función para cargar datos en la tabla
+  async function loadTankData() {
+    const tank = tanksData[index];
+    if (!tank) return;
+
+    const tankSection = document.querySelectorAll('.tank')[index];
+    if (!tankSection) return;
+
+    const { data, error } = await supabase
+      .from('water_levels')
+      .select('*')
+      .eq('tank_id', tank.id)
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    // Estado del acuario
+    const statusEl = tankSection.querySelector('.tank-status');
+    const thresholds = await loadTankThresholds(tank.id);
+
+    // 1. No hay datos ni thresholds
+    if (!data.length && !thresholds) {
+      renderTankStatus(statusEl, {
+        status: 'neutral',
+        message: 'ℹ️ Rangos no definidos',
+        extra: 'ℹ️ Sin registros  '
+      });
+
+      await loadLastMeasurement(tank.id, tankSection);
+      return;
+    }
+
+    // 2. Hay datos pero NO hay thresholds
+    if (data.length && !thresholds) {
+      renderTankStatus(statusEl, {
+        status: 'neutral',
+        message: 'ℹ️ Rangos no definidos',
+        extra: '✅ Con registros  '
+      });
+      // ⚠️ NO renderTable
+      // ⚠️ NO renderChart
+      await loadLastMeasurement(tank.id, tankSection);
+      return;
+    }
+
+    // 3. No hay datos pero sí thresholds
+    if (!data.length && thresholds) {
+      renderTankStatus(statusEl, {
+        status: 'neutral',
+        message: '✅ Rangos definidos',
+        extra: 'ℹ️ Sin registros  '
+      });
+
+      await loadLastMeasurement(tank.id, tankSection);
+      return;
+    }
+
+    // 4. Hay datos y hay thresholds → caso normal
+    renderTable(data, thresholds);
+    renderChart(data);
+
+
+    const latest = data[data.length - 1];
+    const status = getTankStatus(latest, thresholds);
+
+    renderTankStatus(statusEl, {
+      status,
+      message:
+        status === 'ok'
+          ? '✅ Agua estable'
+          : status === 'warning'
+          ? '⚠️ Revisar parámetros'
+          : '❌ Estado crítico',
+      extra: thresholds?.source === 'auto'
+        ? '🐟 Rangos biológicos activos  '
+        : null
+    });
+
+
+    // Detalles de la alerta
+    const issues = getTankIssues(latest, thresholds);
+    const detailsEl = document.createElement('ul');
+    detailsEl.className = 'tank-issues';
+
+    issues.forEach(issue => {
+      const li = document.createElement('li');
+      const label = WATER_PARAMS[issue.key] || issue.key;
+
+      if (issue.message.includes('>') || issue.message.includes('<')) {
+        li.textContent = `${label} (${issue.message})`;
+      } else {
+        li.textContent = `${label}: ${issue.message}`;
+      }
+
+      detailsEl.appendChild(li);
+    });
+
+    // limpiar anteriores
+    tankSection.querySelectorAll('.tank-issues').forEach(el => el.remove());
+
+    if (issues.length) {
+      tankSection.querySelector('.tank-status').after(detailsEl);
+    }
+
+    await loadLastMeasurement(tank.id, tankSection);
+
+  }
+
+  // Evaluar estado del acuario
+  function getTankStatus(values, thresholds) {
+    let danger = false;
+    let warning = false;
+
+    WATER_PARAMS.forEach(param => {
+      const v = values[param];
+      if (v == null) return;
+
+      if (param === 'amoniaco') {
+        const r = evaluateAmmonia(v, values.ph);
+        if (r?.status === 'danger') danger = true;
+        if (r?.status === 'warning') warning = true;
+        return;
+      }
+
+      if (ALERT_RANGES[param]) {
+        const r = ALERT_RANGES[param].evaluate(v);
+        if (r.status === 'danger') danger = true;
+        if (r.status === 'warning') warning = true;
+        return;
+      }
+
+      const min = thresholds?.[`${param}_min`];
+      const max = thresholds?.[`${param}_max`];
+      if ((min != null && v < min) || (max != null && v > max)) {
+        danger = true;
+      }
+    });
+
+    if (danger) return 'danger';
+    if (warning) return 'warning';
+    return 'ok';
+  }
+
+
+  //Función única para pintar el estado
+  function renderTankStatus(statusEl, { status, message, extra } = {}) {
+    statusEl.dataset.status = status || 'neutral';
+
+    // Limpiar completamente
+    statusEl.innerHTML = '';
+
+    const text = document.createElement('span');
+    text.className = 'status-text';
+    text.textContent = message || '';
+
+    statusEl.appendChild(text);
+
+    if (extra) {
+      const extraEl = document.createElement('span');
+      extraEl.textContent = ` · ${extra}`;
+      statusEl.appendChild(extraEl);
+    }
+
+    const btn = document.createElement('button');
+    btn.className = 'edit-thresholds-btn';
+    btn.title = 'Editar rangos';
+    btn.textContent = '⚙️';
+
+    statusEl.appendChild(btn);
+  }
+
+
+  //Añadir información detallada de la alerta encima de la tabla.
+  function getTankIssues(latest, thresholds) {
+    const issues = [];
+
+    for (const key in latest) {
+      const value = latest[key];
+      if (value == null) continue;
+
+      // AMONIACO → NH3
+      if (key === 'amoniaco') {
+        const r = evaluateAmmonia(value, latest.ph);
+        if (r && r.status !== 'ok') {
+          issues.push({
+            key,
+            status: r.status,
+            value,
+            message: r.msg
+          });
+        }
+        continue;
+      }
+
+      // ALERTAS FIJAS (NO2, NO3, PO4, Cl, Fe…)
+      if (ALERT_RANGES[key]) {
+        const r = ALERT_RANGES[key].evaluate(value);
+        if (r.status !== 'ok') {
+          issues.push({
+            key,
+            status: r.status,
+            value,
+            message: r.msg
+          });
+        }
+        continue;
+      }
+
+      // PARÁMETROS BIOLÓGICOS (thresholds)
+      if (thresholds) {
+        const min = thresholds[`${key}_min`];
+        const max = thresholds[`${key}_max`];
+
+        if (min != null && value < min) {
+          issues.push({
+            key,
+            status: 'danger',
+            value,
+            message: `${value} < ${min}`
+          });
+        } else if (max != null && value > max) {
+          issues.push({
+            key,
+            status: 'danger',
+            value,
+            message: `${value} > ${max}`
+          });
+        }
+      }
+    }
+
+    return issues;
+  }
+
+
+
+  // Mapa de nombres para mostrar en los mensajes
+  const WATER_PARAMS = [
+    'temperature',
+    'ph',
+    'gh',
+    'kh',
+    'nitratos',
+    'nitritos',
+    'amoniaco',
+    'po',
+    'cl',
+    'hierro'
+  ];
+
+
+  // Función para mostrar la hora o el día de la última medición
+  function timeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+
+    const minutes = Math.floor(diffMs / 60000);
+    const hours = Math.floor(diffMs / 3600000);
+    const days = Math.floor(diffMs / 86400000);
+
+    if (minutes < 1) return 'justo ahora';
+    if (minutes < 60) return `hace ${minutes} min`;
+    if (hours < 24) return `hace ${hours} h`;
+    return `hace ${days} días`;
+  }
+
+  async function loadLastMeasurement(tankId, tankSection) {
+    const { data } = await supabase
+      .from('water_levels')
+      .select('created_at')
+      .eq('tank_id', tankId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const el = tankSection.querySelector('.last-measurement');
+
+    if (!data) {
+      el.textContent = 'Sin mediciones';
+      return;
+    }
+
+    el.textContent = `Última medición: ${timeAgo(data.created_at)}`;
+  }
+
+  // Renderizar tabla de niveles de agua
+  function renderTable(rows, thresholds) {
+    if (!thresholds) return;
+    const tbody = document
+      .querySelectorAll('.tank')
+      [index].querySelector('tbody');
+
+    tbody.innerHTML = '';
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+
+      tr.innerHTML = `
+        <td>${row.date}</td>
+
+        ${renderCell('temperature', row, thresholds)}
+        ${renderCell('ph', row, thresholds)}
+        ${renderCell('gh', row, thresholds)}
+        ${renderCell('kh', row, thresholds)}
+        ${renderCell('nitratos', row, thresholds)}
+        ${renderCell('nitritos', row, thresholds)}
+        ${renderCell('amoniaco', row, thresholds)}
+        ${renderCell('po', row, thresholds)}
+        ${renderCell('cl', row, thresholds)}
+        ${renderCell('hierro', row, thresholds)}
+
+        <td>${row.notes ?? ''}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Evaluar el estado de un valor según los umbrales
+  function getValueStatus(value, min, max) {
+    if (value === null || value === undefined) return '';
+
+    const v = Number(value);
+    if (Number.isNaN(v)) return '';
+
+    // Fuera de rango → peligro
+    if (min !== null && min !== undefined && v < min) return 'danger';
+    if (max !== null && max !== undefined && v > max) return 'danger';
+
+    // Warning si se acerca al límite (10%)
+    const range = max !== null && min !== null ? max - min : null;
+
+    if (range && min !== null && v <= min + range * 0.1) return 'warning';
+    if (range && max !== null && v >= max - range * 0.1) return 'warning';
+
+    return 'ok';
+  }
+
+
+  // Colorear celdas según los thresholds.
+  function getCellStatus(param, value, row, thresholds) {
+    if (value === null || value === undefined) return '';
+
+    // AMONIACO → NH3
+    if (param === 'amoniaco') {
+      const r = evaluateAmmonia(value, row.ph);
+      return r?.status ?? 'ok';
+    }
+
+    // PARÁMETROS CON ALERTAS FIJAS
+    if (ALERT_RANGES[param]) {
+      const r = ALERT_RANGES[param].evaluate(value);
+      return r.status;
+    }
+
+    // PARÁMETROS BIOLÓGICOS (thresholds)
+    if (thresholds) {
+      const min = thresholds[`${param}_min`];
+      const max = thresholds[`${param}_max`];
+
+      if (min != null && value < min) return 'danger';
+      if (max != null && value > max) return 'danger';
+
+      return 'ok';
+    }
+
+    return 'neutral';
+  }
+
+  function renderCell(param, row, thresholds) {
+    const value = row[param];
+    if (value === null || value === undefined) {
+      return `<td></td>`;
+    }
+
+    const status = getCellStatus(param, value, row, thresholds);
+
+    // AMONIACO → mostrar NH3
+    if (param === 'amoniaco') {
+      const nh3 = calculateNH3(value, row.ph, row.temperature);
+
+      return `
+        <td class="${status}">
+          ${value}
+          ${
+            nh3 !== null
+              ? `<div class="nh3-sub">NH₃: ${nh3.toFixed(3)} mg/L</div>`
+              : ''
+          }
+        </td>
+      `;
+    }
+
+    return `<td class="${status}">${value}</td>`;
+  }
+
+
+
+
+
+
+
+  // Gráfica de niveles de agua
+  const ctx = document.getElementById('water-chart').getContext('2d');
+  let chart;
+
+  function renderChart(rows) {
+    const labels = rows.map(r => r.date).reverse();
+    const temperature = rows.map(r => r.temperature).reverse();
+    const ph = rows.map(r => r.ph).reverse();
+    const gh = rows.map(r => r.gh).reverse();
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Temperatura (°C)',
+            data: temperature,
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'pH',
+            data: ph,
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'GH',
+            data: gh,
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'KH',
+            data: rows.map(r => r.kh).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'Nitratos NO3 (mg/L)',
+            data: rows.map(r => r.nitratos).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'Nitritos NO2 (mg/L)',
+            data: rows.map(r => r.nitritos).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'Amonio NH4 - Amoniaco NH3 (mg/L)',
+            data: rows.map(r => r.amoniaco).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'Fosfato PO4 (mg/L)',
+            data: rows.map(r => r.po).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'Cloro Cl (mg/L)',
+            data: rows.map(r => r.cl).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          },
+          {
+            label: 'Hierro Fe (mg/L)',
+            data: rows.map(r => r.hierro).reverse(),
+            borderWidth: 2,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: false }
+        }
+      }
+    });
+  }
+
+
+  // Script para añadir acuarios
+  const tankForm = document.getElementById('tank-form');
+  const addTankBtn = document.getElementById('add-tank');
+
+  addTankBtn.addEventListener('click', () => {
+    tankForm.classList.toggle('is-open');
+    tankForm.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  tankForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(tankForm);
+
+    const { data, error } = await supabase
+      .from('tanks')
+      .insert({
+        name: fd.get('name'),
+        volume_l: fd.get('volume_l') || null
+      })
+      .select()
+      .single();
+      
+      // Insertar valores por defecto de los rangos de alerta
+      await supabase.from('tank_thresholds').insert({
+        tank_id: data.id,
+
+        nitratos_max: 40,
+        nitritos_max: 0,
+        amoniaco_max: 0,
+        po_max: 0.5,
+        cl_max: 0,
+        hierro_max: 0.5,
+
+        source: 'manual'
+      });
+
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    tankForm.reset();
+    tankForm.classList.remove('is-open');
+
+    await loadTanks(); // clave
+  });
+
+  // Cargar acuarios desde la base de datos y crear secciones
+  const tankTrack = document.getElementById('tank-track');
+  
+
+  async function loadTanks() {
+    const { data, error } = await supabase
+      .from('tanks')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    tanksData = data;
+    tankTrack.innerHTML = '';
+
+    data.forEach(tank => {
+      const section = document.createElement('section');
+      section.className = 'tank';
+      section.dataset.tankId = tank.id;
+
+      section.innerHTML = `
+        <h2>${tank.name}${tank.volume_l ? ` (${tank.volume_l}L)` : ''}</h2>
+        <div class="tank-fish">
+          <h3 class="title-list">Peces en este acuario:</h3>
+          <ul class="fish-list"></ul>
+          <p class="fish-legend">
+            ♂ Macho · ♀ Hembra · ⚥ Hermafrodita
+          </p>
+          <br>
+        </div>
+
+        <div class="tank-status" data-status="neutral">
+          <span class="status-text">ℹ️ Rangos no definidos</span>
+          <button class="edit-thresholds-btn" title="Editar rangos">⚙️</button>
+        </div>
+        <br>
+        <div class="tank-meta">
+          <span class="last-measurement"></span>
+        </div>
+
+        <form class="thresholds-form" hidden>
+          <h3>Rangos óptimos del acuario</h3>
+
+          <div class="threshold-table">
+            <div class="th-row th-head">
+              <span>Parámetro</span>
+              <span>Mín</span>
+              <span>Máx</span>
+            </div>
+
+            ${thresholdRow('temperature', 'Temperatura (°C)')}
+            ${thresholdRow('ph', 'pH')}
+            ${thresholdRow('gh', 'GH')}
+            ${thresholdRow('kh', 'KH')}
+            ${thresholdRow('nitratos', 'Nitratos')}
+            ${thresholdRow('nitritos', 'Nitritos')}
+            ${thresholdRow('amoniaco', 'Amoniaco')}
+          </div>
+
+          <div class="threshold-actions">
+            <button type="submit">Guardar rangos</button>
+          </div>
+        </form>
+
+
+        <table class="water-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Temperatura (ºC)</th>
+              <th>pH</th>
+              <th>GH</th>
+              <th>KH</th>
+              <th>Nitratos NO3 (mg/L)</th>
+              <th>Nitritos NO2 (mg/L)</th>
+              <th>Amonia NH4 - Amoniaco NH3 (mg/L)</th>
+              <th>PO4 (mg/L)</th>
+              <th>Cloro Cl (mg/L)</th>
+              <th>Hierro Fe (mg/L)</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      `;
+
+      tankTrack.appendChild(section);
+      renderTankFish(tank);
+    });
+
+    index = 0;
+    update();
+  }
+  await loadTanks();
+
+  tankTrack.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.edit-thresholds-btn');
+    if (!btn) return;
+
+    const tankSection = btn.closest('.tank');
+    const form = tankSection.querySelector('.thresholds-form');
+    const tankId = tankSection.dataset.tankId;
+
+    form.hidden = !form.hidden;
+
+    if (!form.hidden) {
+      const thresholds = await loadTankThresholds(tankId);
+      if (thresholds) fillThresholdForm(form, thresholds);
+    }
+  });
+
+  function fillThresholdForm(form, thresholds) {
+    for (const key in thresholds) {
+      if (!key.endsWith('_min') && !key.endsWith('_max')) continue;
+      const input = form.querySelector(`[name="${key}"]`);
+      if (input) input.value = thresholds[key] ?? '';
+    }
+  }
+
+  tankTrack.addEventListener('submit', async (e) => {
+    const form = e.target.closest('.thresholds-form');
+    if (!form) return;
+
+    e.preventDefault();
+
+    const tankSection = form.closest('.tank');
+    const tankId = tankSection.dataset.tankId;
+    const fd = new FormData(form);
+
+    const payload = { tank_id: tankId };
+
+    for (const [key, value] of fd.entries()) {
+      payload[key] = value === '' ? null : Number(value);
+    }
+
+    const { data, error } = await supabase
+      .from('tank_thresholds')
+      .upsert(payload, { onConflict: 'tank_id' })
+      .select()
+      .single();
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    tankThresholds.set(tankId, data);
+
+    form.hidden = true;
+
+    const statusEl = tankSection.querySelector('.tank-status');
+    renderTankStatus(statusEl, {
+      status: 'ok',
+      message: '✔ Rangos configurados'
+    });
+  });
+
+  function thresholdRow(key, label) {
+    return `
+      <div class="th-row">
+        <span>${label}</span>
+        <input type="number" step="0.1" name="${key}_min" placeholder="—">
+        <input type="number" step="0.1" name="${key}_max" placeholder="—">
+      </div>
+    `;
+  }
+
+
+  //Calcular los rangos óptimos del acuario según los peces que contiene
+  function computeTankThresholds(fishes) {
+    const params = ['temperature', 'ph', 'gh', 'kh'];
+    const result = {};
+
+    for (const param of params) {
+      const mins = [];
+      const maxs = [];
+
+      fishes.forEach(row => {
+        const fish = row.fish;
+        if (!fish) return;
+
+        const min = fish[`${param}_min`];
+        const max = fish[`${param}_max`];
+
+        if (min != null && max != null) {
+          mins.push(min);
+          maxs.push(max);
+        }
+      });
+
+      if (mins.length) {
+        result[`${param}_min`] = mins.reduce((a, b) => a + b, 0) / mins.length;
+        result[`${param}_max`] = maxs.reduce((a, b) => a + b, 0) / maxs.length;
+      }
+    }
+
+    return result;
+  }
+
+
+  //Guardar los rangos calculados automáticamente
+  async function updateTankThresholdsFromFish(tankId) {
+    const fishes = await fetchTankFish(tankId);
+    if (!fishes.length) return;
+
+    const bioThresholds = computeTankThresholds(fishes);
+
+    const payload = {
+      tank_id: tankId,
+      source: 'auto',
+      ...bioThresholds
+    };
+
+    const { error } = await supabase
+      .from('tank_thresholds')
+      .upsert(payload, { onConflict: 'tank_id' });
+
+    if (error) {
+      console.error(error);
+    } else {
+      tankThresholds.delete(tankId);
+    }
+  }
+
+
+  async function fetchTankFish(tankId) {
+    if (!tankId) return [];
+
+    const { data, error } = await supabase
+      .from('tank_fish')
+      .select(`
+        quantity,
+        sex,
+        fish:fish_id (
+          id,
+          nombre_comun,
+          temperature_min,
+          temperature_max,
+          ph_min,
+          ph_max,
+          gh_min,
+          gh_max,
+          kh_min,
+          kh_max
+        )
+      `)
+      .eq('tank_id', tankId)
+    ;
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return data ?? [];
+  }
+
+
+  async function renderTankFish(tank) {
+    const fishes = await fetchTankFish(tank.id);
+
+    const section = document.querySelector(
+      `.tank[data-tank-id="${tank.id}"]`
+    );
+    if (!section) return;
+
+    const list = section.querySelector('.fish-list');
+    list.innerHTML = '';
+
+    if (!fishes.length) {
+      list.innerHTML = '<li class="empty">No hay peces asignados</li>';
+      return;
+    }
+
+    // Agrupar por especie
+    const grouped = {};
+
+    fishes.forEach(row => {
+      if (!row.fish) return;
+
+      const name = row.fish.nombre_comun;
+      const sex = row.sex || 'Indeterminado';
+      const qty = row.quantity ?? 1;
+
+      if (!grouped[name]) {
+        grouped[name] = {
+          total: 0,
+          Macho: 0,
+          Hembra: 0,
+          Hermafrodita: 0,
+          Indeterminado: 0
+        };
+      }
+
+      grouped[name].total += qty;
+      grouped[name][sex] += qty;
+    });
+
+    // Render
+    Object.entries(grouped).forEach(([name, data]) => {
+      const li = document.createElement('li');
+
+      const sexDetails = [];
+      if (data.Macho) sexDetails.push(`${data.Macho}♂`);
+      if (data.Hembra) sexDetails.push(`${data.Hembra}♀`);
+      if (data.Hermafrodita) sexDetails.push(`${data.Hermafrodita}⚥`);
+
+      const suffix =
+        sexDetails.length
+          ? ` (${sexDetails.join(' y ')})`
+          : '';
+
+      li.textContent = `${name} × ${data.total}${suffix}`;
+      list.appendChild(li);
+    });
+  }
+
+  //Enfocar inicio de página en el div de niveles de agua
+  window.addEventListener('load', () => {
+    const firstTank = document.querySelector('.water-levels[data-index="0"]');
+
+    if (firstTank) {
+      firstTank.scrollIntoView({
+        block: 'start',
+        inline: 'nearest',
+        behavior: 'auto'
+      });
+    }
+  });
+  window.addEventListener('load', () => {
+    const firstTank = document.querySelector('.water-levels[data-index="0"]');
+    if (!firstTank) return;
+
+    requestAnimationFrame(() => {
+      firstTank.scrollIntoView({ block: 'start' });
+    });
+  });
+
+
+</script>

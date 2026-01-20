@@ -1,0 +1,357 @@
+<div id="modal-backdrop" hidden>
+  <div class="modal">
+    <h2 id="modal-title">Nueva ficha de pez</h2>
+
+    <form id="add-fish-form" data-mode="create" data-fish-id="">
+      <div class="full-fields">
+      <fieldset>
+        <legend>Datos básicos</legend>
+
+        <label>
+          Nombre común
+          <input name="nombreComun" id="nombreComun" required />
+        </label>
+
+        <label>
+          Nombre científico
+          <input name="nombreCientifico" id="nombreCientifico" />
+        </label>
+
+        <label>
+          Familia
+          <input name="familia" />
+        </label>
+
+        <label>
+          Origen
+          <input name="origen" />
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Características</legend>
+
+        <label>
+          Color
+          <input name="color" />
+        </label>
+
+        <label>
+          Sexo
+          <input name="sexo" />
+        </label>
+
+        <label>
+          Tamaño adulto (cm)
+          <input name="tamanoAdulto" id="tamanoAdulto" />
+        </label>
+      </fieldset>
+
+      <fieldset>
+  <legend>Parámetros de agua</legend>
+
+    <label>
+      Temperatura (mín)
+      <input name="temperaturaMin" type="number" step="0.1" />
+    </label>
+
+    <label>
+      Temperatura (máx)
+      <input name="temperaturaMax" type="number" step="0.1" />
+    </label>
+
+    <label>
+      pH (mín)
+      <input name="phMin" type="number" step="0.1" />
+    </label>
+
+    <label>
+      pH (máx)
+      <input name="phMax" type="number" step="0.1" />
+    </label>
+
+    <label>
+      GH (mín)
+      <input name="ghMin" type="number" step="1" />
+    </label>
+
+    <label>
+      GH (máx)
+      <input name="ghMax" type="number" step="1" />
+    </label>
+
+    <label>
+      KH (mín)
+      <input name="khMin" type="number" step="1" />
+    </label>
+
+    <label>
+      KH (máx)
+      <input name="khMax" type="number" step="1" />
+    </label>
+  </fieldset>
+
+
+      <fieldset>
+        <legend>Especificaciones</legend>
+
+        <label>
+          Comportamiento
+          <textarea name="comportamiento"></textarea>
+        </label>
+
+        <label>
+          Alimentación
+          <textarea name="alimentacion"></textarea>
+        </label>
+
+        <label>
+          Compatibilidad
+          <textarea name="compatibilidad"></textarea>
+        </label>
+        <label>
+          Reproducción
+          <textarea name="reproduccion"></textarea>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Información adicional</legend>
+        <label>
+          Acuario:
+          <select name="tank_id">
+            <option value="">— Sin asignar —</option>
+          </select>
+        </label>
+
+        <label>
+          Fecha de incorporación
+          <input type="date" name="fechaIncorporacion" required />
+        </label>
+
+        <label>
+          Fecha de fallecimiento
+          <input type="date" name="fechaFallecimiento" />
+        </label>
+
+        <label>
+          Causa de la muerte
+          <input name="causaMuerte" />
+        </label>
+
+        <label>
+          Comprado en
+          <input name="compradoEn" />
+        </label>
+
+        <label>
+          Curiosidades
+          <textarea name="curiosidades"></textarea>
+        </label>
+
+        <label>
+          Notas
+          <textarea name="notas"></textarea>
+        </label>
+      </fieldset>
+      </div>
+
+      <div class="photo-field">
+        <label>
+          Foto (URL)
+          <input name="fotoUrl" placeholder="https://..." />
+        </label>
+        <label>
+          Subir desde tu equipo
+          <input type="file" name="fotoFile" accept="image/*" />
+        </label>
+
+        <div class="upload-status" aria-live="polite" style="font-size:0.9rem;color:#444"></div>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="cancel-btn">Cancelar</button>
+        <button type="submit">Guardar ficha</button>
+      </div>
+    </form>
+  </div>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const cfgEl = document.getElementById("supabase-config");
+    const supabaseUrl = cfgEl?.dataset?.url;
+    const supabaseAnonKey = cfgEl?.dataset?.key;
+    const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
+    const cancelBtn = document.getElementById("cancel-btn");
+    const form = document.getElementById("add-fish-form");
+
+
+    const scientificInput = document.getElementById("nombreCientifico");
+    const commonInput = document.getElementById("nombreComun");
+
+    const fields = {
+      // Parámetros de agua
+      temperature_min: document.querySelector('[name="temperaturaMin"]'),
+      temperature_max: document.querySelector('[name="temperaturaMax"]'),
+      ph_min: document.querySelector('[name="phMin"]'),
+      ph_max: document.querySelector('[name="phMax"]'),
+      gh_min: document.querySelector('[name="ghMin"]'),
+      gh_max: document.querySelector('[name="ghMax"]'),
+      kh_min: document.querySelector('[name="khMin"]'),
+      kh_max: document.querySelector('[name="khMax"]'),
+
+      // Tamaño
+      size_cm: document.querySelector('[name="tamanoAdulto"]'),
+
+      // Nuevos campos de especie
+      familia: document.querySelector('[name="familia"]'),
+      origen: document.querySelector('[name="origen"]'),
+      comportamiento: document.querySelector('[name="comportamiento"]'),
+      alimentacion: document.querySelector('[name="alimentacion"]'),
+      compatibilidad: document.querySelector('[name="compatibilidad"]'),
+      reproduccion: document.querySelector('[name="reproduccion"]'),
+      curiosidades: document.querySelector('[name="curiosidades"]')
+    };
+
+
+    let debounce;
+
+    scientificInput?.addEventListener("input", () => {
+      const name = scientificInput.value.trim();
+
+      if (name.length < 4) {
+        const notice = document.querySelector(".species-notice");
+        if (notice) notice.remove();
+        clearTimeout(debounce);
+        return;
+      }
+
+      clearTimeout(debounce);
+
+      debounce = setTimeout(async () => {
+        const { data, error } = await supabase
+          .from("fish_species")
+          .select("*")
+          .ilike("scientific_name", name)
+          .maybeSingle();
+
+        if (error || !data) {
+          const notice = document.querySelector(".species-notice");
+          if (notice) notice.remove();
+          return;
+        }
+
+        fillSpeciesFields(data);
+        showSpeciesNotice(data.scientific_name);
+      }, 400);
+    });
+
+
+    function fillSpeciesFields(species) {
+      // Nombre común
+      if (commonInput && species.common_name) {
+        commonInput.value ||= species.common_name;
+      }
+
+      Object.entries(fields).forEach(([key, input]) => {
+        if (!input) return;
+
+        const value = species[key];
+        if (value !== null && value !== undefined && value !== "") {
+          input.value ||= value;
+        }
+      });
+    }
+
+
+    function showSpeciesNotice(name) {
+      let notice = document.querySelector(".species-notice");
+      if (!notice) {
+        notice = document.createElement("div");
+        notice.className = "species-notice";
+        notice.style.fontSize = "0.9rem";
+        notice.style.color = "#2b7a78";
+        notice.style.marginTop = "0.4rem";
+        scientificInput.after(notice);
+      }
+
+      notice.textContent = `Plantilla detectada: ${name}. Datos cargados automáticamente.`;
+    }
+
+    //Resetear el formulario al pulsar cancelar.
+    cancelBtn?.addEventListener("click", () => {
+      // Borra aviso de plantilla
+      const notice = document.querySelector(".species-notice");
+      if (notice) notice.remove();
+
+      // Limpia debounce pendiente
+      clearTimeout(debounce);
+
+      // Limpia inputs por seguridad (por si el reset no se dispara aún)
+      form?.reset();
+    });
+
+  </script>
+  
+
+</div>
+
+<style>
+#modal-backdrop[hidden] {
+  display: none !important;
+}
+#modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #f6f1e7;
+  padding: 1.5rem;
+  width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 6px;
+  font-family: Georgia, serif;
+}
+
+fieldset {
+  border: 1px solid #d6d0c4;
+  margin-bottom: 1rem;
+  padding: 0.8rem;
+}
+
+legend {
+  font-weight: bold;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.6rem;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  padding: 0.4rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Photo-only mode: hide the full form and show only the photo field */
+#add-fish-form[data-photo-only="1"] .full-fields { display: none; }
+#add-fish-form .photo-field { display: block; margin-bottom: 1rem; }
+
+#add-fish-form .photo-field label { display:flex; flex-direction:column; }
+
+</style>

@@ -1,0 +1,548 @@
+/* =========================
+ PÁGINA COMPLETA NIVELES AGUA
+   ========================= */
+:root {
+  --paper: #fdfaf4;
+  --ink: #2b2b2b;
+  --muted: #7a7a7a;
+  --accent: #3a6ea5;
+  --border-soft: rgba(0,0,0,0.08);
+}
+
+body {
+  background: #646464;
+}
+.full-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: #646464;
+}
+.carousel {
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 350ms ease;
+}
+
+.tank {
+    flex: 0 0 100%;
+    box-sizing: border-box;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.6),
+        rgba(255,255,255,0.3)
+    );
+    border-radius: 10px;
+    padding: 1.5rem;
+}
+
+.tank h2 {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.water-levels {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.25),
+    inset 0 0 0 1px var(--border-soft);
+  
+  position: relative;
+}
+
+.wl-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: var(--ink);
+}
+
+.wl-controls button {
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.wl-controls button:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+#tank-indicator {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.carousel {
+  overflow: hidden;
+  background: #f6f1e7;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  width: 100%;
+}
+
+
+.carousel-track {
+  display: flex;
+  width: 100%;
+}
+
+.tank h2 {
+  margin-top: 0;
+}
+
+.chart-wrapper {
+  margin-top: 1.5rem;
+}
+
+.water-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-top: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  border-radius: 2rem;
+  overflow: hidden;
+}
+
+.water-table thead th {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 4px solid var(--border-soft);
+  border-right: 1px solid var(--border-soft);
+  border-left: 1px solid var(--border-soft);
+  border-top: 1px solid var(--border-soft);
+  background: #0089c9ce;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.water-table tbody td {
+  padding: 0.55rem 0.5rem;
+  border-bottom: 2px solid var(--border-soft);
+  border-right: 1px solid var(--border-soft);
+  border-left: 1px solid var(--border-soft);
+  text-align: center;
+  overflow: hidden;
+}
+
+.water-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.062);
+}
+
+.water-table td:first-child{
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--accent);
+  border-left: none;
+}
+.water-table td:last-child{
+  border-right: none;
+}
+.water-table thead th{
+  border-top: none;
+}
+.water-table thead th:first-child{
+  border-left: none;
+}
+.water-table thead th:last-child{
+  border-right: none;
+}
+.water-table tbody tr:last-child td{
+  border-bottom: none;
+}
+
+
+/* formulario */
+.water-form {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.25),
+    inset 0 0 0 1px var(--border-soft);
+
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+
+  /* NUEVO */
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 350ms ease, opacity 250ms ease;
+}
+
+.water-form.is-open {
+  max-height: 1000px;
+  margin: 1rem auto;
+  padding: 1.5rem;
+  opacity: 1;
+}
+
+
+.water-form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  color: var(--muted);
+  gap: 0.25rem;
+}
+
+.water-form input,
+.water-form textarea {
+  padding: 0.45rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.water-form textarea {
+  resize: vertical;
+  min-height: 2.5rem;
+}
+.water-form button {
+  grid-column: 1 / -1;
+  justify-self: end;
+
+  padding: 0.5rem 1.2rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.water-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/*graficas*/
+
+.chart-wrapper {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255,255,255,0.6);
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+}
+
+/* =========================
+   NAVEGACIÓN
+   ========================= */
+
+.book-nav {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+}
+
+.book-nav a {
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.6rem 1.2rem;
+  text-decoration: none;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.book-nav a:hover {
+  background: #eee8dc;
+}
+
+/* =========================
+   BOTÓN AÑADIR REGISTRO
+   ========================= */
+.wl-add-btn {
+    display: flex;
+    flex-direction: row;
+}
+
+#add-reg {
+    margin-left: auto;
+    margin-top: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1rem;
+    border: none;
+    background: #3a6ea5;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+}
+#add-reg:hover {
+    background: #335f8d;
+}
+
+.add-aquarium-btn {
+  margin-left: 0.5rem;
+  margin-bottom: 1rem;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--accent);
+  background-image: url("/icons/add-tank.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 75px 75px;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+.add-aquarium-btn:hover {
+
+  background-color: #335f8d;
+  transform: translateY(-1px);
+
+}
+
+/* =========================
+   LISTA DE PECES POR ACUARIO
+   ========================= */
+.tank-fish .fish-list {
+  padding: 1rem;
+  margin: 0px;
+
+}
+.title-list {
+  margin-bottom: 0px;
+  font-size: 1.1rem;
+  text-align: left;
+  color: var(--ink);
+}
+
+.fish-legend {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.fish-list li {
+  line-height: 1.4;
+}
+
+
+
+/* =========================
+   NAVEGACIÓN FLOTANTE TABLAS
+   ========================= */
+
+.wl-nav-floating {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wl-nav-floating .nav-btn {
+  pointer-events: auto;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(58,110,165,0.95);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  transition: transform 120ms ease, background 120ms ease;
+}
+
+.wl-nav-floating .nav-btn:hover {
+  transform: translateY(-50%) scale(1.05);
+  background: #335f8d;
+}
+
+.wl-nav-floating .nav-btn.left {
+  left: -20px;
+}
+
+.wl-nav-floating .nav-btn.right {
+  right: -20px;
+}
+
+
+/* =========================
+ FORMULARIO AÑADIR ACUARIO
+   ========================= */
+.tank-form {
+  max-width: 500px;
+  margin: 0 auto;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  display: grid;
+  gap: 1rem;
+
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 300ms ease, opacity 200ms ease;
+}
+
+.tank-form.is-open {
+  max-height: 400px;
+  padding: 1.25rem;
+  margin: 1rem auto;
+  opacity: 1;
+}
+
+
+/* =========================
+   ALERTAS NIVELES AGUA
+   ========================= */
+
+.water-table td.ok {
+  background: rgba(46, 204, 113, 0.15);
+  color: #1e8449;
+  font-weight: 600;
+}
+
+.water-table td.danger {
+  background: rgba(231, 76, 60, 0.15);
+  color: #922b21;
+  font-weight: 700;
+}
+
+.water-table td.warning {
+  background: rgba(241, 196, 15, 0.18);
+  color: #7d6608;
+  font-weight: 600;
+}
+
+
+/* =========================
+ ESTADO ACUARIO: AVISO GLOBAL
+   ========================= */
+.tank-status {
+  margin: 0.5rem 0 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.tank-status[data-status="ok"] {
+  background: rgba(46, 204, 113, 0.18);
+  color: #1e8449;
+}
+
+.tank-status[data-status="warning"] {
+  background: rgba(241, 196, 15, 0.22);
+  color: #7d6608;
+}
+
+.tank-status[data-status="danger"] {
+  background: rgba(231, 76, 60, 0.22);
+  color: #922b21;
+}
+
+.tank-status[data-status="neutral"] {
+  background: rgba(0,0,0,0.05);
+  color: #555;
+}
+
+/* =========================
+ Editor de rangos de niveles
+   ========================= */
+.thresholds-form {
+  margin: 1rem 0 1.5rem;
+  padding: 1.25rem;
+  background: #f6f1e7;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+
+.thresholds-form h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.threshold-table {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+}
+
+.th-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.6fr 0.6fr;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.th-head {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.th-row input {
+  padding: 0.35rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.85rem;
+}
+
+.th-row span {
+  font-size: 0.85rem;
+}
+
+.threshold-actions {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.threshold-actions button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #2f6b4f;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.threshold-actions button:hover {
+  background: #285c44;
+}
+
+/* =========================
+   DETALLES DE LA ALERTA
+   ========================= */
+.tank-issues {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+  color: #c05621;
+}
+
+.tank-issues li {
+  list-style: disc;
+}
+
+
+
+.nh3-sub {
+  font-size: 0.75em;
+  opacity: 0.75;
+  margin-top: 2px;
+}
