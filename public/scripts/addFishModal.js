@@ -1,12 +1,12 @@
 export function initAddFishModal() {
-  const modal = document.getElementById("add-fish-modal");
   const backdrop = document.getElementById("modal-backdrop");
   const openBtn = document.getElementById("add-page-btn");
-  const closeBtns = modal?.querySelectorAll("[data-modal-close]") ?? [];
+  const closeBtns = modal?.querySelectorAll("[cancel-btn]") ?? [];
   const form = modal?.querySelector("form");
 
-  if (!modal || !openBtn) {
+  if (!openBtn) {
     // El modal no existe en esta página
+    console.log("addFishModal: modal o botón no encontrado, no se inicializa.");
     return;
   }
 
