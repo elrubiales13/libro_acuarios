@@ -40,9 +40,12 @@ window.addEventListener("DOMContentLoaded", () => {
       ev.preventDefault();
       ev.stopPropagation();
       fab.classList.remove("open");
+
       document.getElementById("add-page-btn")?.click();
       return;
     }
+
+
 
     // Click fuera → cerrar
     if (!fab.contains(el)) {
