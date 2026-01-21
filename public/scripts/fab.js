@@ -1,4 +1,4 @@
-const BASE = import.meta.env.BASE_URL;
+/*const BASE = import.meta.env.BASE_URL;
 
 window.addEventListener("DOMContentLoaded", () => {
   const fab = document.querySelector(".fab");
@@ -42,4 +42,4 @@ window.addEventListener("DOMContentLoaded", () => {
       fab.classList.remove("open");
     }
   });
-});
+});*/
