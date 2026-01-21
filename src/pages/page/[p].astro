@@ -3,7 +3,6 @@ import BookLayout from "../../layouts/BookLayout.astro";
 import FishSheet from "../../components/FishSheet.astro";
 import FloatingAddButton from "../../components/FloatingAddButton.astro";
 import AddFishModal from "../../components/AddFishModal.astro";
-import FishIndex from "../../components/FishIndex.astro";
 import { supabase } from "../../lib/supabase";
 
 export const prerender = true;
@@ -142,58 +141,17 @@ const BASE = import.meta.env.BASE_URL;
             data-url={PUBLIC_SUPABASE_URL} 
             data-key={PUBLIC_SUPABASE_ANON_KEY} 
             data-bucket={PUBLIC_SUPABASE_BUCKET}>
-        </div> 
+        </div>
+        <div
+            id="app-config"
+            data-base={import.meta.env.BASE_URL}>
+        </div>
+
         <script
             type="module"
             src={`${import.meta.env.BASE_URL}scripts/fab.js`}>
         </script>
+        
 
     </div> 
 </BookLayout>
-<script type="module">
-    window.addEventListener("DOMContentLoaded", () => {
-        const fab = document.querySelector(".fab");
-        if (!fab) return;
-
-        document.addEventListener("click", (ev) => {
-            let node = ev.target;
-            while (node && node.nodeType !== 1) node = node.parentNode;
-            if (!node) return;
-
-            const el = node;
-            const BASE = import.meta.env.BASE_URL;
-
-            // Toggle FAB
-            if (el.closest("#fabToggle")) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            fab.classList.toggle("open");
-            return;
-            }
-
-            // Water levels
-            if (el.closest("#waterLevels")) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            fab.classList.remove("open");
-            window.location.href = `${BASE}water-levels`;
-            return;
-            }
-
-            // Add page
-            if (el.closest("#add-page-btn")) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            fab.classList.remove("open");
-            document.getElementById("add-page-btn")?.click();
-            return;
-            }
-
-            // Click fuera → cerrar
-            if (!fab.contains(el)) {
-            fab.classList.remove("open");
-            }
-        });
-    });
-
-</script>

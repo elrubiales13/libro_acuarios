@@ -1,4 +1,11 @@
-/*const BASE = import.meta.env.BASE_URL;
+
+const config = document.getElementById("app-config");
+
+const BASE_URL = config?.dataset.base ?? "/";
+
+console.log("BASE_URL:", BASE_URL);
+
+
 
 window.addEventListener("DOMContentLoaded", () => {
   const fab = document.querySelector(".fab");
@@ -24,7 +31,7 @@ window.addEventListener("DOMContentLoaded", () => {
       ev.preventDefault();
       ev.stopPropagation();
       fab.classList.remove("open");
-      window.location.href = `${BASE}water-levels`;
+      window.location.href = `${BASE_URL}water-levels`;
       return;
     }
 
@@ -42,4 +49,4 @@ window.addEventListener("DOMContentLoaded", () => {
       fab.classList.remove("open");
     }
   });
-});*/
+});
