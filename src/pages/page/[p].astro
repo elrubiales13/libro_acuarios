@@ -1,0 +1,148 @@
+---
+import BookLayout from "../../layouts/BookLayout.astro";
+import FishSheet from "../../components/FishSheet.astro";
+import FloatingAddButton from "../../components/FloatingAddButton.astro";
+import AddFishModal from "../../components/AddFishModal.astro";
+import FishIndex from "../../components/FishIndex.astro";
+import { supabase } from "../../lib/supabase";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const { data } = await supabase
+    .from("fish_records")
+    .select("id")
+    .order("created_at", { ascending: true });
+
+  const fishes = data ?? [];
+
+  return fishes.map((_, i) => ({
+    params: { p: String(i + 1) },
+  }));
+}
+
+// Página actual
+const p = Number(Astro.params.p ?? "0");
+
+// Reusar la lógica que ya tienes
+const { data } = await supabase
+  .from("fish_records")
+  .select("*")
+  .order("created_at", { ascending: true });
+
+const fishes = data ?? [];
+
+const fishIndex = p - 1;
+const fish =
+  p > 0
+    ? fishes[Math.min(fishIndex, fishes.length - 1)]
+    : null;
+
+const safeIndex = Math.max(0, Math.min(p, fishes.length - 1));
+let tankName = null;
+
+if (fish) {
+  type TankJoin = {
+    tank: {
+      name: string;
+    } | null;
+  };
+
+  const { data: tankData } = await supabase
+    .from("tank_fish")
+    .select("tank:tank_id(name)")
+    .eq("fish_id", fish.id)
+    .limit(1);
+
+  const typedTankData = tankData as TankJoin[] | null;
+  tankName = typedTankData?.[0]?.tank?.name ?? null;
+}
+// Exponer las vars PUBLIC_ en el HTML para que el script cliente las lea
+const PUBLIC_SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const PUBLIC_SUPABASE_BUCKET = import.meta.env.PUBLIC_SUPABASE_BUCKET ?? "";
+const BASE = import.meta.env.BASE_URL;
+---
+<BookLayout title="Mi Libro de Acuarios"> 
+    <div slot="left"> 
+        {fish && ( 
+            <FishSheet 
+                id={fish.id} 
+                foto_url={fish.foto_url} 
+                nombre_comun={fish.nombre_comun} 
+                nombre_cientifico={fish.nombre_cientifico} 
+                familia={fish.familia} origen={fish.origen} 
+                color={fish.color} 
+                sexo={fish.sexo} 
+                tamano={fish.tamano_adulto} 
+                temperatura_min={fish.temperature_min} 
+                temperatura_max={fish.temperature_max} 
+                ph_minimo={fish.ph_min} 
+                ph_maximo={fish.ph_max} 
+                gh_minimo={fish.gh_min} 
+                gh_maximo={fish.gh_max} 
+                kh_minimo={fish.kh_min} 
+                kh_maximo={fish.kh_max} 
+                comportamiento={fish.comportamiento} 
+                alimentacion={fish.alimentacion} 
+                compatibilidad={fish.compatibilidad} 
+                reproduccion={fish.reproduccion} 
+                fecha_incorporacion={fish.fecha_incorporacion} 
+                acuario={tankName} 
+                fecha_fallecimiento={fish.fecha_fallecimiento} 
+                causa_muerte={fish.causa_muerte} 
+                compradoEn={fish.comprado_en} 
+                curiosidades={fish.curiosidades} 
+                notas={fish.notas_adicionales} 
+            /> 
+        )} 
+    </div> 
+    <div slot="right" class="image-page"> 
+        {fish && ( 
+            fish.foto_url ? <img 
+            src={fish.foto_url} 
+            alt={fish.nombre_comun} 
+            loading="lazy" /> : <div class="no-image"> 
+            <p class="no-image-title">{fish.nombre_comun}</p> 
+            </div> 
+        )} 
+    </div> 
+    
+    <nav slot="nav" class="book-nav">
+        {/* Anterior */}
+        <a
+            class="prev"
+            href={p == 1 ? `${BASE}` : `${BASE}page/${p - 1}/`}
+            data-astro-reload
+        >
+            ← Anterior
+        </a>
+
+        {/* Siguiente */}
+        {p < fishes.length && (
+            <a
+            class="next"
+            href={`${BASE}page/${p + 1}/`}
+            data-astro-reload
+            >
+            Siguiente →
+            </a>
+        )}
+    </nav>
+
+
+
+
+    <div slot="ui"> 
+        <FloatingAddButton />
+        <AddFishModal /> 
+        <div 
+            id="supabase-config" 
+            style="display:none" 
+            data-url={PUBLIC_SUPABASE_URL} 
+            data-key={PUBLIC_SUPABASE_ANON_KEY} 
+            data-bucket={PUBLIC_SUPABASE_BUCKET}>
+        </div> 
+        <script type="module" src="/src/scripts/fab.js"></script>
+    </div> 
+</BookLayout>

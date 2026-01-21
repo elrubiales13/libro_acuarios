@@ -297,7 +297,7 @@ body {
   border-radius: 50%;
   border: none;
   background-color: var(--accent);
-  background-image: url("/icons/add-tank.png");
+  background-image: url("https://elrubiales13.github.io/libro_acuarios/icons/add-tank.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 75px 75px;
