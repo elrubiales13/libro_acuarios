@@ -7,6 +7,8 @@ interface FishIndexItem {
 const { fishes } = Astro.props as {
   fishes: FishIndexItem[];
 };
+
+const BASE = import.meta.env.BASE_URL;
 ---
 
 
@@ -17,7 +19,7 @@ const { fishes } = Astro.props as {
   <ul class="index-list">
     {fishes.map((fish, i) => (
       <li class="index-item">
-        <a href={`?p=${i + 1}`} data-astro-reload>
+        <a href={`${BASE}page/${i + 1}/`} data-astro-reload>
           <span class="index-name">
             {fish.nombre_comun}
           </span>
