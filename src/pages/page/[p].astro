@@ -143,6 +143,10 @@ const BASE = import.meta.env.BASE_URL;
             data-key={PUBLIC_SUPABASE_ANON_KEY} 
             data-bucket={PUBLIC_SUPABASE_BUCKET}>
         </div> 
-        <script type="module" src="/libro_acuarios/src/scripts/fab.js"></script>
+        <script
+            type="module"
+            src={`${import.meta.env.BASE_URL}scripts/fab.js`}>
+        </script>
+
     </div> 
 </BookLayout>
