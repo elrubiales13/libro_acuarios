@@ -92,17 +92,20 @@ const renderFish = (fish) => {
 
 // suscripción a strore clave
 store.subscribe(({ fishes, currentPage, loaded }) => {
-  if (!loaded) return;
+    if (!loaded) return;
 
-  if (currentPage === 0) {
-    renderIndex(fishes);
-  } else {
-    renderFish(fishes[currentPage - 1]);
-  }
+    if (currentPage === 0) {
+        renderIndex(fishes);
+    } else {
+        renderFish(fishes[currentPage - 1]);
+    }
 
-  qs("#nav-prev").style.visibility = currentPage > 0 ? "visible" : "hidden";
-  qs("#nav-next").style.visibility =
-    currentPage < fishes.length ? "visible" : "hidden";
+    qs("#nav-prev").style.visibility = currentPage > 0 ? "visible" : "hidden";
+    qs("#nav-next").style.visibility =
+        currentPage < fishes.length ? "visible" : "hidden";
+
+    document.dispatchEvent(new Event("spa:render"));
+
 });
 
 

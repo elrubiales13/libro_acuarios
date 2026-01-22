@@ -181,9 +181,21 @@
     const cfgEl = document.getElementById("supabase-config");
     const supabaseUrl = cfgEl?.dataset?.url;
     const supabaseAnonKey = cfgEl?.dataset?.key;
-    const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
+    let supabase = null;
+    if (supabaseUrl && supabaseAnonKey) {
+      try {
+        supabase = createClient(supabaseUrl, supabaseAnonKey);
+      } catch (err) {
+        console.error('AddFishModal: error creating supabase client', err);
+        supabase = null;
+      }
+    } else {
+      console.warn('AddFishModal: supabase config missing — species lookup disabled.');
+    }
     const cancelBtn = document.getElementById("cancel-btn");
     const form = document.getElementById("add-fish-form");
+
+    console.log('AddFishModal: init script running', { cancelBtn: !!cancelBtn, form: !!form });
 
 
     const scientificInput = document.getElementById("nombreCientifico");
@@ -218,6 +230,9 @@
 
     scientificInput?.addEventListener("input", () => {
       const name = scientificInput.value.trim();
+
+      // If supabase isn't configured, skip species lookup.
+      if (!supabase) return;
 
       if (name.length < 4) {
         const notice = document.querySelector(".species-notice");
@@ -279,17 +294,38 @@
     }
 
     //Resetear el formulario al pulsar cancelar.
-    cancelBtn?.addEventListener("click", () => {
-      // Borra aviso de plantilla
-      const notice = document.querySelector(".species-notice");
-      if (notice) notice.remove();
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", (e) => {
+        console.log('AddFishModal: cancel button clicked');
+        try {
+          e.preventDefault();
+          e.stopPropagation();
 
-      // Limpia debounce pendiente
-      clearTimeout(debounce);
+          form?.reset();
+          clearTimeout(debounce);
 
-      // Limpia inputs por seguridad (por si el reset no se dispara aún)
-      form?.reset();
-    });
+          const notice = document.querySelector(".species-notice");
+          if (notice) notice.remove();
+
+          const backdrop = document.getElementById("modal-backdrop");
+          if (backdrop) {
+            backdrop.hidden = true;
+            console.log('AddFishModal: backdrop hidden set to', backdrop.hidden);
+          } else {
+            console.log('AddFishModal: backdrop element not found');
+          }
+        } catch (err) {
+          console.error('AddFishModal: error in cancel handler', err);
+        }
+      });
+    } else {
+      console.warn('AddFishModal: cancel button not found, listener not attached');
+    }
+
+    
+
+
+
 
   </script>
   
