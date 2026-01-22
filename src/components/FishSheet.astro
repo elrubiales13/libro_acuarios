@@ -1,197 +1,34 @@
 ---
-const {
-  id,
-  foto_url,
-  nombre_comun,
-  nombre_cientifico,
-  familia,
-  origen,
-  color,
-  sexo,
-  tamano,
-  temperatura_min,
-  temperatura_max,
-  ph_minimo,
-  ph_maximo,
-  gh_minimo,
-  gh_maximo,
-  kh_minimo,
-  kh_maximo,
-  comportamiento,
-  alimentacion,
-  compatibilidad,
-  reproduccion,
-  fecha_incorporacion,
-  acuario,
-  fecha_fallecimiento,
-  causa_muerte,
-  compradoEn,
-  curiosidades,
-  notas,
-} = Astro.props;
-
+const { id } = Astro.props;
 ---
-
-
-<!--data-field es el nombre de la columna en supabase -->
 <div class="fish-sheet" data-fish-id={id}>
-  <span class="value" data-field="foto_url" style="display:none">{foto_url}</span>
-  <div class="field">
-    <h2><span class="value" data-field="nombre_comun">{nombre_comun}</span></h2>
-  </div>
-  <div class="field">
-    <p class="value" data-field="nombre_cientifico"><em>{nombre_cientifico}</em></p> 
-  </div>
-  
+  <span class="value" data-field="foto_url" style="display:none"></span>
+  <h2 class="value" data-field="nombre_comun"></h2>
+  <p class="value" data-field="nombre_cientifico"></p>
+  <p class="value" data-field="familia"></p>
+  <p class="value" data-field="origen"></p>
+  <p class="value" data-field="color"></p>
+  <p class="value" data-field="sexo"></p>
+  <p class="value" data-field="tamano_adulto"></p>
+  <p class="value" data-field="temperature_min"></p>
+  <p class="value" data-field="temperature_max"></p>
 
-  <div class="field">
-    <span class="label">Familia:</span>
-    <span class="value" data-field="familia">{familia}</span>
-  </div>
+  <p class="value" data-field="ph_min"></p>
+  <p class="value" data-field="ph_max"></p>
+  <p class="value" data-field="gh_min"></p>
+  <p class="value" data-field="gh_max"></p>
 
-
-  <div class="field">
-    <span class="label">Origen:</span>
-    <span class="value" data-field="origen">{origen}</span>
-  </div>
-
-  <div class="field">
-    <span class="label">Color:</span>
-    <span class="value" data-field="color">{color}</span>
-  </div>
-
-  <div class="field">
-    <span class="label">Sexo:</span>
-    <span class="value" data-field="sexo">{sexo}</span>
-  </div>
-
-  <div class="field">
-    <span class="label">Tamaño adulto:</span>
-    <span class="value" data-field="tamano_adulto">{tamano}</span>
-    <span class="unit">cm</span>
-  </div>
-
-  <hr />
-
-  <div class="field">
-    <span class="label">Temperatura:</span>
-    <span class="value-group">
-      <span class="value" data-field="temperature_min">{temperatura_min ?? '—'}</span>
-      <span class="sep">–</span>
-      <span class="value" data-field="temperature_max">{temperatura_max ?? '—'}</span>
-      <span class="unit">°C</span>
-    </span>
-  </div>
-
-
-
-  <div class="field">
-    <span class="label">pH:</span>
-    <span class="value-group">
-      <span class="value" data-field="ph_min">{ph_minimo ?? '—'}</span>
-      <span class="sep">–</span>
-      <span class="value" data-field="ph_max">{ph_maximo ?? '—'}</span>
-    </span>
-  </div>
-
-
-
-  <div class="field">
-    <span class="label">GH:</span>
-    <span class="value-group">
-      <span class="value" data-field="gh_min">{gh_minimo ?? '—'}</span>
-      <span class="sep">–</span>
-      <span class="value" data-field="gh_max">{gh_maximo ?? '—'}</span>
-      <span class="unit">dGH</span>
-    </span>
-  </div>
-
-
-  <div class="field">
-    <span class="label">KH:</span>
-    <span class="value-group">
-      <span class="value" data-field="kh_min">{kh_minimo ?? '—'}</span>
-      <span class="sep">–</span>
-      <span class="value" data-field="kh_max">{kh_maximo ?? '—'}</span>
-      <span class="unit">dKH</span>
-    </span>
-  </div>
-
-
-
-  <hr />
-
-  <div class="field">
-    <span class="label">Comportamiento:</span>
-    <br>
-    <span class="value" data-field="comportamiento">{comportamiento}</span>
-  </div>
-  <br>
-  <div class="field">
-    <span class="label">Alimentación:</span>
-    <br>
-    <span class="value" data-field="alimentacion">{alimentacion}</span>
-  </div>
-  <br>
-  <div class="field">
-    <span class="label">Compatibilidad:</span>
-    <br>
-    <span class="value" data-field="compatibilidad">{compatibilidad}</span>
-  </div>
-  <br>
-  <div class="field">
-    <span class="label">Reproducción:</span>
-    <br>
-    <span class="value" data-field="reproduccion">{reproduccion}</span>
-  </div>
-
-  <hr />
-
-  <div class="field">
-    <span class="label">Fecha de incorporación:</span>
-    <span class="value" data-field="fecha_incorporacion">{fecha_incorporacion}</span>
-  </div>
-
-  <div class="field">
-    <span class="label">Acuario:</span>
-    <span class="value" data-field="acua">
-      {acuario ?? "—"}
-    </span>
-  </div>
-
-  <div class="field">
-    <span class="label">Fecha de fallecimiento:</span>
-    <span class="value" data-field="fecha_fallecimiento">
-      {fecha_fallecimiento ?? "—"}
-    </span>
-  </div>
-
-  <div class="field">
-    <span class="label">Causa de la muerte:</span>
-    <span class="value" data-field="causa_muerte">
-      {causa_muerte ?? "—"}
-    </span>
-  </div>
-
-
-  <hr />
-  <div class="field">
-    <span class="label">Comprado en:</span>
-    <span class="value" data-field="comprado_en">{compradoEn}</span>
-  </div>
-
-  <div class="field">
-    <span class="label">Curiosidades:</span>
-    <br>
-    <span class="value" data-field="curiosidades">{curiosidades}</span>
-  </div>
-  <div class="field">
-    <span class="label">Notas:</span>
-    <br>
-    <span class="value" data-field="notas_adicionales">{notas}</span>
-  </div>
-
-
-
- 
+  <p class="value" data-field="kh_min"></p>
+  <p class="value" data-field="kh_max"></p>
+  <p class="value" data-field="comportamiento"></p>
+  <p class="value" data-field="alimentacion"></p>
+  <p class="value" data-field="compatibilidad"></p>
+  <p class="value" data-field="reproduccion"></p>
+  <p class="value" data-field="fecha_incorporacion"></p>
+  <p class="value" data-field="acua"></p>
+  <p class="value" data-field="fecha_fallecimiento"></p>
+  <p class="value" data-field="causa_muerte"></p>
+  <p class="value" data-field="comprado_en"></p>
+  <p class="value" data-field="curiosidades"></p>
+  <p class="value" data-field="notas_adicionales"></p>
 </div>
