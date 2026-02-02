@@ -23,36 +23,37 @@ const BASE = import.meta.env.BASE_URL;
 </head>
 
 <body>
-
-  <main class="book-container">
-    
-    <!-- Aviso para dispositivos móviles -->
-    <div class="rotate-notice">
-      Gira el dispositivo para una mejor experiencia 📖
-    </div>
-
-    <!-- PORTADA -->
-    <section class="book-cover" id="book-cover">
-      <div class="cover-content">
-        <h1>{title}</h1>
-        <p>Libro de control y seguimiento de acuarios</p>
-        <button class="open-book-btn">Abrir libro</button>
-        <span>- Rubén Núñez Merino -</span>
+  <div class="viewport">
+    <main class="book-container">
+      
+      <!-- Aviso para dispositivos móviles -->
+      <div class="rotate-notice">
+        Gira el dispositivo para una mejor experiencia 📖
       </div>
-    </section>
 
-    <!-- LIBRO -->
-    <section class="book is-hidden" id="book">
-      <div class="page left">
-        <slot name="left" />
-      </div>
-      <div class="book-spine"></div>
-      <div class="page right">
-        <slot name="right" />
-      </div>
-    </section>
+      <!-- PORTADA -->
+      <section class="book-cover" id="book-cover">
+        <div class="cover-content">
+          <h1>{title}</h1>
+          <p>Libro de control y seguimiento de acuarios</p>
+          <button class="open-book-btn">Abrir libro</button>
+          <span>- Rubén Núñez Merino -</span>
+        </div>
+      </section>
 
-  </main>
+      <!-- LIBRO -->
+      <section class="book is-hidden" id="book">
+        <div class="page left">
+          <slot name="left" />
+        </div>
+        <div class="book-spine"></div>
+        <div class="page right">
+          <slot name="right" />
+        </div>
+      </section>
+
+    </main>
+  </div>
   <!-- Navegación del libro -->
   <div id="book-nav">
     <slot name="nav" />
