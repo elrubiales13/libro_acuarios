@@ -18,7 +18,7 @@
     justify-content: center;
     z-index: 2000;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 2.5rem;
   }
 }
 
@@ -45,6 +45,7 @@ body {
   padding: 2rem;
   background: #646464;
   border-radius: 12px;
+  padding-bottom: 15%;
 }
 
 
