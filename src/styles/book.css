@@ -1,35 +1,6 @@
 /* =========================
    MÓVILES Y TABLETS
    ========================= */
-@media (max-width: 1024px) {
-  body {
-    overflow: hidden;
-  }
-
-  .book-wrapper {
-    transform-origin: center center;
-    transform: scale(
-      min(
-        calc(100vw / 900),
-        calc(100svh / 600)
-      )
-    );
-  }
-}
-
-
-@media (max-width: 1024px) and (orientation: portrait) {
-  .book-wrapper {
-    transform:
-      rotate(90deg)
-      scale(
-        min(
-          calc(100svh / 900),
-          calc(100vw / 600)
-        )
-      );
-  }
-}
 
 
 .rotate-notice {
@@ -60,42 +31,23 @@
   --paper: #f6f1e7;
   --ink: #2b2b2b;
   --shadow: rgba(0,0,0,0.25);
-}
 
-* {
-  box-sizing: border-box;
-}
-
-.viewport {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100svh;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-  background: #000; /* bordes arriba/abajo */
+  --border-soft: rgba(0,0,0,0.08);
 }
 
 
 body {
-  margin: 0;
-  
   background: #646464;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Georgia, serif;
-  color: var(--ink);
 }
 
-.book-wrapper {
-  width: 900px;
-  height: 600px;
+.full-page {
+  min-height: 100vh;
+  padding: 2rem;
+  background: #646464;
+  border-radius: 12px;
 }
+
+
 
 /* =========================
    Book Cover
@@ -198,6 +150,7 @@ body {
   box-shadow: 0 20px 50px var(--shadow);
   overflow: hidden;
   transform-style: preserve-3d;
+  border-radius: 12px;
 }
 
 /* Lomo */
