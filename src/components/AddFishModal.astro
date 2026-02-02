@@ -178,9 +178,10 @@
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const cfgEl = document.getElementById("supabase-config");
+    const cfgEl = document.getElementById("app-config");
     const supabaseUrl = cfgEl?.dataset?.url;
     const supabaseAnonKey = cfgEl?.dataset?.key;
+
     let supabase = null;
     if (supabaseUrl && supabaseAnonKey) {
       try {
@@ -196,6 +197,140 @@
     const form = document.getElementById("add-fish-form");
 
     console.log('AddFishModal: init script running', { cancelBtn: !!cancelBtn, form: !!form });
+    
+    const tankSelect = document.querySelector('select[name="tank_id"]');
+
+    async function loadTanks() {
+      if (!supabase || !tankSelect) return;
+
+      const { data, error } = await supabase
+        .from("tanks")
+        .select("id, name")
+        .order("name");
+
+      if (error) {
+        console.error("Error cargando acuarios:", error);
+        return;
+      }
+
+      for (const tank of data) {
+        const option = document.createElement("option");
+        option.value = tank.id;
+        option.textContent = tank.name;
+        tankSelect.appendChild(option);
+      }
+    }
+
+    loadTanks();
+
+    import { store } from "/libro_acuarios/scripts/store.js";
+
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!supabase) {
+        alert("Supabase no está configurado");
+        return;
+      }
+
+      const formData = new FormData(form);
+
+      const payload = {
+        nombre_comun: formData.get("nombreComun"),
+        nombre_cientifico: formData.get("nombreCientifico"),
+        familia: formData.get("familia"),
+        origen: formData.get("origen"),
+        color: formData.get("color"),
+        sexo: formData.get("sexo"),
+        tamano_adulto: formData.get("tamanoAdulto"),
+
+        temperature_min: formData.get("temperaturaMin"),
+        temperature_max: formData.get("temperaturaMax"),
+        ph_min: formData.get("phMin"),
+        ph_max: formData.get("phMax"),
+        gh_min: formData.get("ghMin"),
+        gh_max: formData.get("ghMax"),
+        kh_min: formData.get("khMin"),
+        kh_max: formData.get("khMax"),
+
+        comportamiento: formData.get("comportamiento"),
+        alimentacion: formData.get("alimentacion"),
+        compatibilidad: formData.get("compatibilidad"),
+        reproduccion: formData.get("reproduccion"),
+        curiosidades: formData.get("curiosidades"),
+        notas_adicionales: formData.get("notas"),
+
+        fecha_incorporacion: formData.get("fechaIncorporacion"),
+        fecha_fallecimiento: formData.get("fechaFallecimiento") || null,
+        causa_muerte: formData.get("causaMuerte"),
+        comprado_en: formData.get("compradoEn"),
+
+        foto_url: formData.get("fotoUrl"),
+        tank_id: formData.get("tank_id") || null
+      };
+
+      const mode = form.dataset.mode;
+      const fishId = form.dataset.fishId;
+
+      let result;
+
+      if (mode === "edit") {
+        await supabase
+          .from("fish_records")
+          .update(payload)
+          .eq("id", fishId);
+
+        const state = store.getState();
+        store.setState({
+          fishes: state.fishes.map(f =>
+            f.id === fishId ? { ...f, ...payload } : f
+          )
+        });
+        
+      } else {
+        result = await supabase
+          .from("fish_records")
+          .insert(payload)
+          .select()
+          .single();
+      }
+
+      const { data: savedFish, error } = result;
+
+
+      if (error) {
+        console.error("Error insertando pez:", error);
+        alert("Error al guardar la ficha");
+        return;
+      }
+      // 👇 NUEVO: asignación al acuario
+      if (payload.tank_id) {
+        await supabase.from('tank_fish').insert({
+          tank_id: payload.tank_id,
+          fish_id: newFish.id,
+          quantity: 1,
+          sex: 'Indeterminado'
+        });
+      }
+
+
+      // 🔥 ACTUALIZAR LA SPA
+      const state = store.getState();
+
+      store.setState({
+        fishes: [...state.fishes, newFish],
+        currentPage: state.fishes.length + 1
+      });
+
+      // Cerrar modal y limpiar
+      form.reset();
+
+      const notice = document.querySelector(".species-notice");
+      if (notice) notice.remove();
+
+      const backdrop = document.getElementById("modal-backdrop");
+      if (backdrop) backdrop.hidden = true;
+    });
 
 
     const scientificInput = document.getElementById("nombreCientifico");
@@ -232,7 +367,7 @@
       const name = scientificInput.value.trim();
 
       // If supabase isn't configured, skip species lookup.
-      if (!supabase) return;
+      //if (!supabase) return;
 
       if (name.length < 4) {
         const notice = document.querySelector(".species-notice");

@@ -1,9 +1,11 @@
 ---
 export const prerender = true;
 
+
 import BookLayout from "../layouts/BookLayout.astro";
 import FloatingAddButton from "../components/FloatingAddButton.astro";
 import AddFishModal from "../components/AddFishModal.astro";
+
 
 const BASE = import.meta.env.BASE_URL;
 const PUBLIC_SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
@@ -51,7 +53,7 @@ const PUBLIC_SUPABASE_BUCKET = import.meta.env.PUBLIC_SUPABASE_BUCKET ?? "";
 <!-- Templates SPA -->
 <template id="tpl-index">
   <div class="index-cover">
-    <h2>Índice general</h2>
+    <h2>Índice de especies</h2>
     <ul class="fish-index"></ul>
   </div>
 </template>

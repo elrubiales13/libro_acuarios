@@ -30,7 +30,9 @@ const initFab = () => {
   addBtn?.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (modal) modal.hidden = false;
+    if (window.openFishModal) {
+      window.openFishModal({ mode: "create" });
+    }
   });
 
   // Botón water-levels
