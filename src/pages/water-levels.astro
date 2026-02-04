@@ -335,24 +335,18 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const { error } = await supabase
       .from('water_levels')
       .insert(payload);
-    if (!error) {
-      const tankId = tanksData[index].id;
-      const tankSection = document.querySelectorAll('.tank')[index];
-      loadLastMeasurement(tankId, tankSection);
-    }
 
     if (error) {
       alert(error.message);
       return;
     }
 
+    //RECARGAR TODO EL ACUARIO ACTUAL TRAS INSERTAR NUEVOS REGISTROS
+    await loadTankData();
+
+    // limpiar UI
     form.reset();
     form.classList.remove('is-open');
-
-    // recargar SOLO si coincide con el acuario visible
-    if (payload.tank === tanks[index].dataset.tank) {
-      loadTankData(payload.tank);
-    }
   });
 
   // Botón para mostrar/ocultar formulario
@@ -457,9 +451,9 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       const label = WATER_PARAMS[issue.key] || issue.key;
 
       if (issue.message.includes('>') || issue.message.includes('<')) {
-        li.textContent = `${label} (${issue.message})`;
+        li.textContent = `${issue.label} (${issue.message})`;
       } else {
-        li.textContent = `${label}: ${issue.message}`;
+        li.textContent = `${issue.label} ${issue.message}`;
       }
 
       detailsEl.appendChild(li);
@@ -541,6 +535,32 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
 
   //Añadir información detallada de la alerta encima de la tabla.
+    // Formatear números a dos decimales
+  function fmt(n, decimals = 2) {
+    const num = Number(n);
+    return Number.isNaN(num)
+      ? ''
+      : parseFloat(num.toFixed(decimals)).toString();
+  }
+
+    // Etiquetas para los parámetros (temperature => 'Temperatura', etc.)
+  const PARAM_LABELS = {
+    temperature: '🌡️ Temperatura (ºC): ',
+    ph: '⚗️ pH: ',
+    gh: '🧪 GH: ',
+    kh: '🧪 KH: ',
+    no2: '☠️ Nitritos (NO₂) (mg/L): ',
+    no3: '☠️ Nitratos (NO₃) (mg/L): ',
+    nh3: '☠️ Amoniaco (NH₃) (mg/L): ',
+    po4: '🌿 Fosfatos (PO₄) (mg/L): ',
+    cl: '🚱 Cloro (Cl) (mg/L): ',
+    hierro: '🔩 Hierro (Fe) (mg/L): '
+  };
+
+  function labelFor(key) {
+    return PARAM_LABELS[key] ?? key;
+  }
+
   function getTankIssues(latest, thresholds) {
     const issues = [];
 
@@ -554,6 +574,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         if (r && r.status !== 'ok') {
           issues.push({
             key,
+            label: labelFor(key),
             status: r.status,
             value,
             message: r.msg
@@ -568,6 +589,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         if (r.status !== 'ok') {
           issues.push({
             key,
+            label: labelFor(key),
             status: r.status,
             value,
             message: r.msg
@@ -584,16 +606,18 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         if (min != null && value < min) {
           issues.push({
             key,
+            label: labelFor(key),
             status: 'danger',
             value,
-            message: `${value} < ${min}`
+            message: `${fmt(value)} < ${fmt(min)}`
           });
         } else if (max != null && value > max) {
           issues.push({
             key,
+            label: labelFor(key),
             status: 'danger',
             value,
-            message: `${value} > ${max}`
+            message: `${fmt(value)} > ${fmt(max)}`
           });
         }
       }
@@ -681,11 +705,56 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         ${renderCell('hierro', row, thresholds)}
 
         <td>${row.notes ?? ''}</td>
+        <td class="actions">
+          <button 
+            class="delete-record-btn"
+            data-id="${row.id}"
+            aria-label="Eliminar registro"
+          >
+            🗑
+          </button>
+        </td>
       `;
 
       tbody.appendChild(tr);
     });
   }
+
+  
+  // Eliminar registros
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.delete-record-btn');
+    if (!btn) return;
+
+    const recordId = btn.dataset.id;
+    if (!recordId) return;
+
+    const confirmDelete = confirm(
+      '¿Eliminar este registro de parámetros? Esta acción no se puede deshacer.'
+    );
+
+    if (!confirmDelete) return;
+
+    await deleteWaterRecord(recordId);
+  });
+
+  async function deleteWaterRecord(recordId) {
+    const { error } = await supabase
+      .from('water_levels')
+      .delete()
+      .eq('id', recordId);
+
+    if (error) {
+      alert('Error eliminando el registro');
+      console.error(error);
+      return;
+    }
+
+    //refrescar tabla + gráfica
+    await loadTankData();
+  }
+
+
 
   // Evaluar el estado de un valor según los umbrales
   function getValueStatus(value, min, max) {
@@ -992,6 +1061,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
               <th>Cloro Cl (mg/L)</th>
               <th>Hierro Fe (mg/L)</th>
               <th>Notas</th>
+              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1191,7 +1261,9 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     fishes.forEach(row => {
       if (!row.fish) return;
-
+      
+      const cleanName = row.fish.nombre_comun.split('"')[0].trim(); //quitar todo lo que venga después de las comillas en el nombre común
+      row.fish.nombre_comun = cleanName;
       const name = row.fish.nombre_comun;
       const sex = row.sex || 'Indeterminado';
       const qty = row.quantity ?? 1;
@@ -1218,7 +1290,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       if (data.Macho) sexDetails.push(`${data.Macho}♂`);
       if (data.Hembra) sexDetails.push(`${data.Hembra}♀`);
       if (data.Hermafrodita) sexDetails.push(`${data.Hermafrodita}⚥`);
-
+      console.log(sexDetails);
       const suffix =
         sexDetails.length
           ? ` (${sexDetails.join(' y ')})`

@@ -196,6 +196,50 @@
     const cancelBtn = document.getElementById("cancel-btn");
     const form = document.getElementById("add-fish-form");
 
+    // Manejo de subida de foto
+    const fileInput = form?.querySelector('input[name="fotoFile"]');
+    const urlInput  = form?.querySelector('input[name="fotoUrl"]');
+    const statusEl  = form?.querySelector('.upload-status');
+
+    fileInput?.addEventListener("change", async () => {
+      if (!supabase || !fileInput.files?.length) return;
+
+      const file = fileInput.files[0];
+
+      statusEl.textContent = "Subiendo foto…";
+
+      const ext = file.name.split(".").pop();
+      const fileName = `${crypto.randomUUID()}.${ext}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase
+        .storage
+        .from("imagenes")
+        .upload(filePath, file, {
+          upsert: true,
+          cacheControl: "3600"
+        });
+
+      if (uploadError) {
+        console.error("Error subiendo imagen:", uploadError);
+        statusEl.textContent = "Error al subir la imagen";
+        return;
+      }
+
+      const { data } = supabase
+        .storage
+        .from("imagenes")
+        .getPublicUrl(filePath);
+
+      if (data?.publicUrl) {
+        urlInput.value = data.publicUrl;
+        statusEl.textContent = "Imagen subida correctamente ✔";
+      } else {
+        statusEl.textContent = "No se pudo obtener la URL pública";
+      }
+    });
+
+
     console.log('AddFishModal: init script running', { cancelBtn: !!cancelBtn, form: !!form });
     
     const tankSelect = document.querySelector('select[name="tank_id"]');
@@ -271,56 +315,59 @@
 
       const mode = form.dataset.mode;
       const fishId = form.dataset.fishId;
-
-      let result;
+      
+      //ACTUALIZAR LA SPA
+      const state = store.getState();
 
       if (mode === "edit") {
-        await supabase
+        const { error } = await supabase
           .from("fish_records")
           .update(payload)
           .eq("id", fishId);
+          
+        if (error) {
+          console.error("Error actualizando pez:", error);
+          alert("Error al actualizar la ficha");
+          return;
+        }
 
-        const state = store.getState();
+        // Actualizar SPA
         store.setState({
           fishes: state.fishes.map(f =>
             f.id === fishId ? { ...f, ...payload } : f
           )
         });
-        
+
       } else {
-        result = await supabase
+        const { data: savedFish, error } = await supabase
           .from("fish_records")
           .insert(payload)
           .select()
           .single();
-      }
 
-      const { data: savedFish, error } = result;
+        if (error) {
+          console.error("Error insertando pez:", error);
+          alert("Error al guardar la ficha");
+          return;
+        }
 
+        // relación con acuario
+        if (payload.tank_id) {
+          await supabase.from("tank_fish").insert({
+            tank_id: payload.tank_id,
+            fish_id: savedFish.id,
+            quantity: 1,
+            sex: "Indeterminado"
+          });
+        }
 
-      if (error) {
-        console.error("Error insertando pez:", error);
-        alert("Error al guardar la ficha");
-        return;
-      }
-      // 👇 NUEVO: asignación al acuario
-      if (payload.tank_id) {
-        await supabase.from('tank_fish').insert({
-          tank_id: payload.tank_id,
-          fish_id: newFish.id,
-          quantity: 1,
-          sex: 'Indeterminado'
+        store.setState({
+          fishes: [...state.fishes, savedFish],
+          currentPage: state.fishes.length + 1
         });
+
+        
       }
-
-
-      // 🔥 ACTUALIZAR LA SPA
-      const state = store.getState();
-
-      store.setState({
-        fishes: [...state.fishes, newFish],
-        currentPage: state.fishes.length + 1
-      });
 
       // Cerrar modal y limpiar
       form.reset();

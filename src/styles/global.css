@@ -546,3 +546,17 @@ body {
   opacity: 0.75;
   margin-top: 2px;
 }
+
+/* =========================
+   Botón eliminar registro niveles agua
+   ========================= */
+.delete-record-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.delete-record-btn:hover {
+  color: #b00020;
+}
