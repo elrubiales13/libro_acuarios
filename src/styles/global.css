@@ -560,3 +560,734 @@ body {
 .delete-record-btn:hover {
   color: #b00020;
 }
+
+/* =========================
+   GUÍA RÁPIDA DE VALORES DE AGUA (water-guide)
+   ========================= */
+html {
+  scroll-behavior: smooth;
+}
+
+.guide-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  color: var(--ink);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  padding-bottom: 5rem;
+}
+
+/* Header */
+.guide-header {
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), inset 0 0 0 1px var(--border-soft);
+  text-align: center;
+}
+
+.guide-header-badge {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.guide-header h1 {
+  font-size: 2rem;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+}
+
+.guide-subtitle {
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin: 0 0 1.5rem 0;
+}
+
+/* Notice box */
+.notice-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.notice-box.important {
+  background: #fefce8;
+  border: 1px solid #fde047;
+  color: #854d0e;
+}
+
+.notice-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* Quick Nav Chips */
+.quick-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+.quick-nav-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-right: 0.25rem;
+}
+
+.chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 150ms ease;
+}
+
+.chip:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.chip-safety {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.chip-safety:hover {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.chip-cleaning {
+  background: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.chip-cleaning:hover {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+/* Cards General */
+.guide-card {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), inset 0 0 0 1px var(--border-soft);
+}
+
+.card-header h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.35rem;
+  color: #0f172a;
+  border-bottom: 2px solid var(--border-soft);
+  padding-bottom: 0.5rem;
+}
+
+/* Safety Section */
+.safety-card {
+  border-left: 5px solid #ef4444;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.safety-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.safety-table th {
+  background: #334155;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.safety-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-warning {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.badge-info {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+/* Tests Section */
+.tests-section {
+  margin-top: 2rem;
+}
+
+.section-title h2 {
+  font-size: 1.5rem;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  margin-bottom: 1.25rem;
+}
+
+.test-card {
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.test-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+}
+
+.test-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: 0.75rem;
+}
+
+.test-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(58, 110, 165, 0.35);
+}
+
+.test-title-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.test-title-group h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.water-type-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.water-type-badge.fresh-salt {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.water-type-badge.fresh-only {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.why-matters {
+  background: #f8fafc;
+  border-left: 4px solid var(--accent);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.95rem;
+  color: #334155;
+  margin-bottom: 1rem;
+}
+
+.why-matters.danger-text {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.test-steps h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.test-steps ol {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.test-steps li {
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Indicators */
+.color-indicator {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.color-indicator.red { background: #fee2e2; color: #b91c1c; }
+.color-indicator.brown { background: #fef3c7; color: #78350f; }
+.color-indicator.green { background: #dcfce7; color: #15803d; }
+.color-indicator.blue { background: #dbeafe; color: #1d4ed8; }
+.color-indicator.yellow { background: #fef9c3; color: #a16207; }
+
+/* Dilution box */
+.dilution-box {
+  margin-top: 1rem;
+  background: #eff6ff;
+  border: 1px dashed #60a5fa;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.dilution-box h4 {
+  margin: 0 0 0.4rem 0;
+  color: #1e40af;
+  font-size: 0.95rem;
+}
+
+.dilution-box ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+  color: #1e3a8a;
+}
+
+.dilution-box li {
+  margin-bottom: 0.25rem;
+}
+
+/* Results box */
+.results-box {
+  margin-top: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border-soft);
+}
+
+.results-box h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 0.95rem;
+}
+
+.result-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.result-item.result-ok {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.result-item.result-warn {
+  background: #fef9c3;
+  color: #713f12;
+}
+
+.result-item.result-danger {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.result-status {
+  font-weight: 700;
+  min-width: 90px;
+}
+
+/* Cleaning Section */
+.cleaning-card {
+  background: linear-gradient(to bottom right, #ffffff, #f0fdf4);
+  border-left: 5px solid #22c55e;
+}
+
+.cleaning-subtitle {
+  font-size: 1.05rem;
+  margin: 0 0 1rem 0;
+}
+
+.cleaning-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.cleaning-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.98rem;
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.bullet-icon {
+  font-size: 1.3rem;
+}
+
+/* Chips adicionales */
+.chip-solutions {
+  background: #fdf4ff;
+  color: #86198f;
+  border-color: #f5d0fe;
+}
+.chip-solutions:hover {
+  background: #c026d3;
+  color: #ffffff;
+}
+
+.chip-diagnostic {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #ffedd5;
+}
+.chip-diagnostic:hover {
+  background: #ea580c;
+  color: #ffffff;
+}
+
+/* Solutions Main Section */
+.solutions-main-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 3px dashed var(--border-soft);
+}
+
+.emergency-banner {
+  background: linear-gradient(135deg, #fef2f2, #fff7ed);
+  border-left: 5px solid #ef4444;
+}
+
+.emergency-header h3 {
+  margin: 0 0 0.5rem 0;
+  color: #991b1b;
+  font-size: 1.25rem;
+}
+
+.golden-rule {
+  font-size: 0.98rem;
+  color: #7f1d1d;
+  line-height: 1.5;
+  background: #ffffff;
+  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+/* Solutions Quick Table */
+.solutions-quick-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  text-align: left;
+}
+
+.solutions-quick-table th {
+  background: #1e293b;
+  color: #ffffff;
+  padding: 0.75rem 0.85rem;
+  font-weight: 600;
+}
+
+.solutions-quick-table td {
+  padding: 0.7rem 0.85rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.solutions-quick-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* Solution Detail Cards */
+.solutions-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.solution-detail-card {
+  position: relative;
+  background: var(--paper);
+}
+
+.sol-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-soft);
+}
+
+.sol-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #3a6ea5;
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.sol-card-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #0f172a;
+}
+
+.sol-desc {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 1rem 0;
+}
+
+.danger-callout {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  margin-bottom: 1rem;
+}
+
+.sub-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.sub-table th {
+  background: #f1f5f9;
+  color: #334155;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 2px solid var(--border-soft);
+}
+
+.sub-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.highlight-table th {
+  background: #e2e8f0;
+}
+
+.timeline-table th {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.sol-block {
+  margin-top: 1rem;
+}
+
+.sol-block h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.sol-block ul, .sol-block ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #334155;
+}
+
+.sol-block li {
+  margin-bottom: 0.35rem;
+}
+
+.check-bullet-list {
+  list-style: none !important;
+  padding-left: 0 !important;
+}
+
+.check-bullet-list li {
+  background: #f8fafc;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  margin-bottom: 0.35rem;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+.warning-callout {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  margin-top: 1rem;
+}
+
+.warning-callout ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.2rem;
+  list-style: none;
+}
+
+.warning-callout li {
+  margin-bottom: 0.35rem;
+}
+
+.emergency-steps li {
+  margin-bottom: 0.4rem;
+  line-height: 1.5;
+}
+
+/* Diagnostic Checklist */
+.diagnostic-card {
+  background: linear-gradient(to bottom right, #ffffff, #fff7ed);
+  border-left: 5px solid #ea580c;
+  margin-top: 2rem;
+}
+
+.diag-intro {
+  font-size: 0.98rem;
+  color: #475569;
+  margin-bottom: 1rem;
+}
+
+.diag-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.diag-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #ffffff;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 150ms ease;
+}
+
+.diag-item:hover {
+  background: #fffaf5;
+}
+
+.diag-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ea580c;
+  cursor: pointer;
+}
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+  .guide-header h1 {
+    font-size: 1.5rem;
+  }
+  .test-title-group h3 {
+    font-size: 1.1rem;
+  }
+  .quick-nav {
+    gap: 0.35rem;
+  }
+  .chip {
+    font-size: 0.78rem;
+    padding: 0.25rem 0.6rem;
+  }
+  .sol-card-header h3 {
+    font-size: 1.05rem;
+  }
+}
+
+

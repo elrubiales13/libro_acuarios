@@ -2,26 +2,9 @@
    MÓVILES Y TABLETS
    ========================= */
 
-
 .rotate-notice {
   display: none;
 }
-
-@media (max-width: 1024px) and (orientation: portrait) {
-  .rotate-notice {
-    position: fixed;
-    inset: 0;
-    background: #111;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    text-align: center;
-    font-size: 2.5rem;
-  }
-}
-
 
 
 /* =========================
@@ -30,9 +13,8 @@
 :root {
   --paper: #f6f1e7;
   --ink: #2b2b2b;
-  --shadow: rgba(0,0,0,0.25);
-
-  --border-soft: rgba(0,0,0,0.08);
+  --shadow: rgba(0, 0, 0, 0.25);
+  --border-soft: rgba(0, 0, 0, 0.08);
 }
 
 
@@ -42,10 +24,13 @@ body {
 
 .full-page {
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1.5rem;
   background: #646464;
-  border-radius: 12px;
-  padding-bottom: 15%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 
@@ -68,32 +53,36 @@ body {
 .book-cover img {
   max-width: 90%;
   border-radius: 4px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .cover-content {
   text-align: center;
   padding: 2rem;
   width: 90%;
+  max-width: 550px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .cover-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  margin-bottom: 0.5rem;
 }
 
 .cover-content p {
   opacity: 0.85;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
-/*Colocar el span abajo y centado en la portada*/
+
 .cover-content span {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   opacity: 0.7;
   font-style: italic;
-  align-items: center;
-  display: block;
-  margin-top: 10rem;
+  margin-top: 2rem;
 }
 
 .open-book-btn {
@@ -104,10 +93,13 @@ body {
   color: #0f1720;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 150ms ease, background 150ms ease;
 }
 
 .open-book-btn:hover {
   opacity: 0.95;
+  transform: scale(1.03);
 }
 
 .book.is-hidden {
@@ -131,21 +123,22 @@ body {
 
 
 /* =========================
-   CONTENEDOR
+   CONTENEDOR & LIBRO
    ========================= */
 
 .book-container {
   perspective: 2000px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
-
-/* =========================
-   LIBRO
-   ========================= */
 
 .book {
   position: relative;
-  width: 900px;
-  height: 550px;
+  width: min(94vw, 950px);
+  height: min(78vh, 600px);
+  min-height: 480px;
   display: flex;
   background: transparent;
   box-shadow: 0 20px 50px var(--shadow);
@@ -162,12 +155,10 @@ body {
   top: 0;
   width: 18px;
   height: 100%;
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.15),
-    rgba(0,0,0,0.05),
-    rgba(0,0,0,0.15)
-  );
+  background: linear-gradient(to right,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.05),
+      rgba(0, 0, 0, 0.15));
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 2;
@@ -232,8 +223,9 @@ body {
 @keyframes post-next {
   0% {
     transform: rotateY(-90deg);
-    box-shadow: inset -20px 0 30px rgba(0,0,0,0.25);
+    box-shadow: inset -20px 0 30px rgba(0, 0, 0, 0.25);
   }
+
   100% {
     transform: rotateY(0deg);
     box-shadow: none;
@@ -248,10 +240,12 @@ body {
   0% {
     transform: rotateY(0deg);
   }
+
   100% {
     transform: rotateY(-90deg);
   }
 }
+
 .page.right.turn-next {
   animation: turn-next 700ms ease-in-out forwards;
 }
@@ -261,13 +255,23 @@ body {
 }
 
 @keyframes turn-next {
-  0% { transform: rotateY(0deg); }
-  100% { transform: rotateY(-160deg); }
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  100% {
+    transform: rotateY(-160deg);
+  }
 }
 
 @keyframes turn-prev {
-  0% { transform: rotateY(0deg); }
-  100% { transform: rotateY(160deg); }
+  0% {
+    transform: rotateY(0deg);
+  }
+
+  100% {
+    transform: rotateY(160deg);
+  }
 }
 
 .page {
@@ -310,7 +314,7 @@ body {
 }
 
 .fish-sheet:hover {
-  background: rgba(0,0,0,0.03);
+  background: rgba(0, 0, 0, 0.03);
 }
 
 @keyframes sheet-in {
@@ -318,6 +322,7 @@ body {
     opacity: 0;
     transform: translateX(50px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateX(0px) scale(1);
@@ -330,7 +335,9 @@ body {
    TIPOGRAFÍA Y CAMPOS
    ========================= */
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin-top: 0;
 }
 
@@ -372,7 +379,7 @@ h1, h2, h3 {
   max-width: 100%;
   max-height: 100%;
   border-radius: 6px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
 }
 
 /* =========================
@@ -403,10 +410,12 @@ h1, h2, h3 {
   pointer-events: none !important;
   transform: translateX(-100%) !important;
 }
+
 .book-opened .book.is-hidden {
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+
 .book-opened #book-nav {
   display: flex;
 }
@@ -422,7 +431,7 @@ h1, h2, h3 {
   padding: 0.6rem 1.4rem;
   text-decoration: none;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   min-width: 130px;
   text-align: center;
   display: inline-block;
@@ -439,7 +448,7 @@ h1, h2, h3 {
   padding: 0.6rem 1.4rem;
   text-decoration: none;
   border-radius: 4px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   min-width: 130px;
   text-align: center;
   display: inline-block;
@@ -468,7 +477,7 @@ h1, h2, h3 {
   color: #f6f1e7;
   border: none;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 .fab-actions {
@@ -477,7 +486,7 @@ h1, h2, h3 {
   right: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  /*gap: 10rem;*/
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px);
@@ -499,31 +508,49 @@ h1, h2, h3 {
   color: #2b2b2b;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 200ms ease, background 150ms ease;
 }
-.fab-action:hover {
+
+/* Disposición en Zigzag */
+.fab-action:nth-child(1) {
+  transform: translateX(-18px);
+}
+
+.fab-action:nth-child(2) {
+  transform: translateX(12px);
+}
+
+.fab-action:nth-child(3) {
+  transform: translateX(-24px);
+}
+
+.fab.open .fab-action:nth-child(1) {
+  transform: translateX(-18px);
+}
+
+.fab.open .fab-action:nth-child(2) {
+  transform: translateX(12px);
+}
+
+.fab.open .fab-action:nth-child(3) {
+  transform: translateX(-24px);
+}
+
+.fab.open .fab-action:nth-child(1):hover {
+  transform: translateX(-18px) scale(1.1);
   background: #e0d6c8;
 }
 
-#add-page-btn {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  font-size: 2rem;
-  border: none;
-  background: #3a6ea5;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.35);
+.fab.open .fab-action:nth-child(2):hover {
+  transform: translateX(12px) scale(1.1);
+  background: #e0d6c8;
 }
 
-#add-page-btn:hover {
-  background: #335f8d;
+.fab.open .fab-action:nth-child(3):hover {
+  transform: translateX(-24px) scale(1.1);
+  background: #e0d6c8;
 }
-
 
 /*Ajuste de parámetros para min y max*/
 .value-group {
@@ -540,4 +567,78 @@ h1, h2, h3 {
   margin-left: 0.25rem;
   opacity: 0.7;
   font-size: 0.9em;
+}
+
+/* =========================
+   RESPONSIVIDAD Y MÓVILES
+   ========================= */
+@media (max-width: 768px) {
+  .full-page {
+    padding: 0.75rem;
+    padding-bottom: 6rem;
+    justify-content: flex-start;
+  }
+
+  .book-container {
+    perspective: none;
+  }
+
+  .book {
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    flex-direction: column;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px var(--shadow);
+    max-height: 80vh;
+  }
+
+  .book::before {
+    display: none;
+    /* Ocultar el lomo en móviles */
+  }
+
+  .page {
+    width: 100%;
+    padding: 1.25rem 1rem;
+    box-sizing: border-box;
+    overflow-y: visible;
+  }
+
+  .image-page {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .image-page img {
+    max-height: 250px;
+    object-fit: contain;
+  }
+
+  #book-nav {
+    bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .book-nav {
+    gap: 0.5rem;
+  }
+
+  .book-nav a {
+    padding: 0.5rem 0.85rem;
+    min-width: auto;
+    font-size: 0.88rem;
+  }
+
+  .fab {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .fab-main {
+    width: 54px;
+    height: 54px;
+    font-size: 1.6rem;
+  }
 }

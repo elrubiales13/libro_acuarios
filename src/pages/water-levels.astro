@@ -2,6 +2,7 @@
 import FullPageLayout from "../layouts/FullPageLayout.astro";
 export const prerender = true;
 
+const BASE = import.meta.env.BASE_URL;
 const PUBLIC_SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
 const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 ---
@@ -13,7 +14,6 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       <input type="date" name="date" required />
     </label>
 
-    
     <label>
       Temperatura (°C)
       <input type="number" step="0.1" name="temperature" />
@@ -86,18 +86,19 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     <button type="submit">Crear acuario</button>
   </form>
 
-
   <div class="water-levels" data-index="0">
     <header class="wl-header">
-      
       <div class="wl-add-btn">
         <h1>Niveles del agua</h1>
-        
+
         <button id="add-reg" type="button" title="Añadir valores">＋</button>
-        <button id="add-tank" type="button" title="Añadir acuario" class="icon-btn add-aquarium-btn"></button>
+        <button
+          id="add-tank"
+          type="button"
+          title="Añadir acuario"
+          class="icon-btn add-aquarium-btn"></button>
       </div>
     </header>
-
 
     <div class="wl-nav-floating">
       <button id="prev-tank" class="nav-btn left">‹</button>
@@ -116,81 +117,106 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   <div class="nav-wrapper">
     <nav class="book-nav">
-      <a href="https://elrubiales13.github.io/libro_acuarios/" data-astro-reload>← Volver</a>
+      <a href={BASE} data-astro-reload>← Volver al Libro</a>
+      <a href={`${BASE}water-guide`} data-astro-reload>📖 Guía de agua</a>
     </nav>
   </div>
-
 </FullPageLayout>
 <div
   id="supabase-config"
   data-url={PUBLIC_SUPABASE_URL}
   data-key={PUBLIC_SUPABASE_ANON_KEY}
-  style="display:none">
+  style="display:none"
+>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-  const cfg = document.getElementById('supabase-config');
+  const cfg = document.getElementById("supabase-config");
 
-  const supabase = createClient(
-    cfg.dataset.url,
-    cfg.dataset.key
-  );
+  const supabase = createClient(cfg.dataset.url, cfg.dataset.key);
   let tanksData = [];
   let index = 0;
 
-
-  const root = document.querySelector('.water-levels');
-  const track = document.querySelector('.carousel-track');
-  const tanks = Array.from(document.querySelectorAll('.tank'));
-  const prevBtn = document.getElementById('prev-tank');
-  const nextBtn = document.getElementById('next-tank');
+  const root = document.querySelector(".water-levels");
+  const track = document.querySelector(".carousel-track");
+  const tanks = Array.from(document.querySelectorAll(".tank"));
+  const prevBtn = document.getElementById("prev-tank");
+  const nextBtn = document.getElementById("next-tank");
   const tankThresholds = new Map();
- 
+
   //Objeto para definir los rangos de alerta por parámetros fijos.
   const ALERT_RANGES = {
     nitratos: {
-      evaluate: v => {
-        if (v <= 40) return { status: 'ok' };
-        if (v <= 50) return { status: 'warning', msg: 'Nitratos elevados' };
-        return { status: 'danger', msg: 'Nitratos peligrosos, cambio de agua' };
-      }
+      evaluate: (v) => {
+        if (v <= 40) return { status: "ok" };
+        if (v <= 50) return { status: "warning", msg: "Nitratos elevados" };
+        return { status: "danger", msg: "Nitratos peligrosos, cambio de agua" };
+      },
     },
 
     nitritos: {
-      evaluate: v => {
-        if (v === 0) return { status: 'ok' };
-        if (v <= 0.5) return { status: 'ok', msg: 'Inocua pero requiere revisión.' };
-        if (v <= 1.0) return { status: 'warning', msg: 'Perjudicial, realice un cambio de agua.' };
-        if (v <= 2.0) return { status: 'danger', msg: 'Peligrosa, posible tratamiento + cambio de agua.' };
-        return { status: 'danger', msg: 'Tóxica, trate el agua y realice un cambio de agua inmediato.' };
-      }
+      evaluate: (v) => {
+        if (v === 0) return { status: "ok" };
+        if (v <= 0.5)
+          return { status: "ok", msg: "Inocua pero requiere revisión." };
+        if (v <= 1.0)
+          return {
+            status: "warning",
+            msg: "Perjudicial, realice un cambio de agua.",
+          };
+        if (v <= 2.0)
+          return {
+            status: "danger",
+            msg: "Peligrosa, posible tratamiento + cambio de agua.",
+          };
+        return {
+          status: "danger",
+          msg: "Tóxica, trate el agua y realice un cambio de agua inmediato.",
+        };
+      },
     },
 
     po: {
-      evaluate: v => {
-        if (v <= 1) return { status: 'ok' };
-        if (v <= 10) return { status: 'warning', msg: 'Posible crecimiento de algas' };
-        return { status: 'danger', msg: 'Crecimiento de algas, cambio de agua' };
-      }
+      evaluate: (v) => {
+        if (v <= 1) return { status: "ok" };
+        if (v <= 10)
+          return { status: "warning", msg: "Posible crecimiento de algas" };
+        return {
+          status: "danger",
+          msg: "Crecimiento de algas, cambio de agua",
+        };
+      },
     },
 
     cl: {
-      evaluate: v => {
-        if (v === 0) return { status: 'ok' };
-        return { status: 'danger', msg: 'Cloro detectado, agua tóxica' };
-      }
+      evaluate: (v) => {
+        if (v === 0) return { status: "ok" };
+        return { status: "danger", msg: "Cloro detectado, agua tóxica" };
+      },
     },
 
     hierro: {
-      evaluate: v => {
-        if (v === 0) return { status: 'danger', msg: 'Agua nociva para las plantas, abone de inmediato.' };
-        if (v < 0.25) return { status: 'warning', msg: 'Escasa presencia de nutrientes, abone durante 3 días.' };
-        if (v <= 0.5) return { status: 'ok', msg: 'Valor ideal para las plantas.' };
-        return { status: 'danger', msg: 'Hierro excesivo, peligroso para los peces, realice un cambio de agua.' };
-      }
-    }
+      evaluate: (v) => {
+        if (v === 0)
+          return {
+            status: "danger",
+            msg: "Agua nociva para las plantas, abone de inmediato.",
+          };
+        if (v < 0.25)
+          return {
+            status: "warning",
+            msg: "Escasa presencia de nutrientes, abone durante 3 días.",
+          };
+        if (v <= 0.5)
+          return { status: "ok", msg: "Valor ideal para las plantas." };
+        return {
+          status: "danger",
+          msg: "Hierro excesivo, peligroso para los peces, realice un cambio de agua.",
+        };
+      },
+    },
   };
 
   //Funciones para calcular el amoniaco tóxico NH3 a partir del amonio NH4 y el pH.
@@ -199,22 +225,27 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const nh3 = calculateNH3(nh4, ph);
     if (nh3 == null) return null;
 
-    if (nh3 >= 0.2) return { status: 'danger', msg: 'Muy tóxico, acción inmediata' };
-    if (nh3 >= 0.05) return { status: 'danger', msg: 'Tóxico, cambio de agua' };
-    if (nh3 >= 0.02) return { status: 'warning', msg: 'Estrés leve, vigilar' };
+    if (nh3 >= 0.2)
+      return { status: "danger", msg: "Muy tóxico, acción inmediata" };
+    if (nh3 >= 0.05) return { status: "danger", msg: "Tóxico, cambio de agua" };
+    if (nh3 >= 0.02) return { status: "warning", msg: "Estrés leve, vigilar" };
 
-    return { status: 'ok' };
+    return { status: "ok" };
   }
 
   function calculatePka(tempC) {
     if (tempC === null || tempC === undefined) return null;
-    return 0.09018 + (2729.92 / (tempC + 273.15));
+    return 0.09018 + 2729.92 / (tempC + 273.15);
   }
 
   function calculateNH3(totalAmmonia, ph, tempC) {
     if (
-      totalAmmonia === null || ph === null || tempC === null ||
-      totalAmmonia === undefined || ph === undefined || tempC === undefined
+      totalAmmonia === null ||
+      ph === null ||
+      tempC === null ||
+      totalAmmonia === undefined ||
+      ph === undefined ||
+      tempC === undefined
     ) {
       return null;
     }
@@ -228,18 +259,16 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   //Definir los colores para los rangos de alerta de la tabla (son valores por defecto)
   function getAlertLevel(value, { min, max } = {}) {
-    if (value === null || value === undefined || value === '') return '';
+    if (value === null || value === undefined || value === "") return "";
 
     const num = Number(value);
-    if (Number.isNaN(num)) return '';
+    if (Number.isNaN(num)) return "";
 
-    if (min !== undefined && num < min) return 'danger';
-    if (max !== undefined && num > max) return 'danger';
+    if (min !== undefined && num < min) return "danger";
+    if (max !== undefined && num > max) return "danger";
 
-    return 'ok';
+    return "ok";
   }
-			
-			
 
   //Cargar datos de alerta
   async function loadTankThresholds(tankId) {
@@ -248,9 +277,9 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     }
 
     const { data, error } = await supabase
-      .from('tank_thresholds')
-      .select('*')
-      .eq('tank_id', tankId)
+      .from("tank_thresholds")
+      .select("*")
+      .eq("tank_id", tankId)
       .maybeSingle(); // 👈 CLAVE
 
     if (error) {
@@ -263,15 +292,14 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     return data;
   }
 
-
   //Evaluar niveles segun las alertas
   function evaluate(value, min, max) {
-    if (value === null || value === undefined) return 'neutral';
+    if (value === null || value === undefined) return "neutral";
 
-    if (min !== null && value < min) return 'danger';
-    if (max !== null && value > max) return 'danger';
+    if (min !== null && value < min) return "danger";
+    if (max !== null && value > max) return "danger";
 
-    return 'ok';
+    return "ok";
   }
 
   //helpel para crear campos de rangos
@@ -293,14 +321,14 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     loadTankData();
   }
 
-  prevBtn.addEventListener('click', () => {
+  prevBtn.addEventListener("click", () => {
     if (index > 0) {
       index--;
       update();
     }
   });
 
-  nextBtn.addEventListener('click', () => {
+  nextBtn.addEventListener("click", () => {
     if (index < tanksData.length - 1) {
       index++;
       update();
@@ -308,33 +336,31 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   });
 
   // Script para insertar datos en la tabla y graficas
-  const form = document.getElementById('water-form');
+  const form = document.getElementById("water-form");
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const fd = new FormData(form);
     const tankId = tanksData[index].id;
 
     const payload = {
-      date: fd.get('date'),
+      date: fd.get("date"),
       tank_id: tankId,
-      temperature: fd.get('temperature') || null,
-      ph: fd.get('ph') || null,
-      gh: fd.get('gh') || null,
-      kh: fd.get('kh') || null,
-      nitratos: fd.get('nitratos') || null,
-      nitritos: fd.get('nitritos') || null,
-      amoniaco: fd.get('amoniaco') || null,
-      po: fd.get('po') || null,
-      cl: fd.get('cl') || null,
-      hierro: fd.get('hierro') || null,
-      notes: fd.get('notes') || null
+      temperature: fd.get("temperature") || null,
+      ph: fd.get("ph") || null,
+      gh: fd.get("gh") || null,
+      kh: fd.get("kh") || null,
+      nitratos: fd.get("nitratos") || null,
+      nitritos: fd.get("nitritos") || null,
+      amoniaco: fd.get("amoniaco") || null,
+      po: fd.get("po") || null,
+      cl: fd.get("cl") || null,
+      hierro: fd.get("hierro") || null,
+      notes: fd.get("notes") || null,
     };
 
-    const { error } = await supabase
-      .from('water_levels')
-      .insert(payload);
+    const { error } = await supabase.from("water_levels").insert(payload);
 
     if (error) {
       alert(error.message);
@@ -346,16 +372,16 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     // limpiar UI
     form.reset();
-    form.classList.remove('is-open');
+    form.classList.remove("is-open");
   });
 
   // Botón para mostrar/ocultar formulario
-  const addBtn = document.getElementById('add-reg');
-  addBtn.addEventListener('click', () => {
-    form.classList.toggle('is-open');
+  const addBtn = document.getElementById("add-reg");
+  addBtn.addEventListener("click", () => {
+    form.classList.toggle("is-open");
 
-    if (form.classList.contains('is-open')) {
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (form.classList.contains("is-open")) {
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   });
 
@@ -364,14 +390,14 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const tank = tanksData[index];
     if (!tank) return;
 
-    const tankSection = document.querySelectorAll('.tank')[index];
+    const tankSection = document.querySelectorAll(".tank")[index];
     if (!tankSection) return;
 
     const { data, error } = await supabase
-      .from('water_levels')
-      .select('*')
-      .eq('tank_id', tank.id)
-      .order('date', { ascending: true });
+      .from("water_levels")
+      .select("*")
+      .eq("tank_id", tank.id)
+      .order("date", { ascending: true });
 
     if (error) {
       console.error(error);
@@ -379,15 +405,15 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     }
 
     // Estado del acuario
-    const statusEl = tankSection.querySelector('.tank-status');
+    const statusEl = tankSection.querySelector(".tank-status");
     const thresholds = await loadTankThresholds(tank.id);
 
     // 1. No hay datos ni thresholds
     if (!data.length && !thresholds) {
       renderTankStatus(statusEl, {
-        status: 'neutral',
-        message: 'ℹ️ Rangos no definidos',
-        extra: 'ℹ️ Sin registros  '
+        status: "neutral",
+        message: "ℹ️ Rangos no definidos",
+        extra: "ℹ️ Sin registros  ",
       });
 
       await loadLastMeasurement(tank.id, tankSection);
@@ -397,9 +423,9 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     // 2. Hay datos pero NO hay thresholds
     if (data.length && !thresholds) {
       renderTankStatus(statusEl, {
-        status: 'neutral',
-        message: 'ℹ️ Rangos no definidos',
-        extra: '✅ Con registros  '
+        status: "neutral",
+        message: "ℹ️ Rangos no definidos",
+        extra: "✅ Con registros  ",
       });
       // ⚠️ NO renderTable
       // ⚠️ NO renderChart
@@ -410,9 +436,9 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     // 3. No hay datos pero sí thresholds
     if (!data.length && thresholds) {
       renderTankStatus(statusEl, {
-        status: 'neutral',
-        message: '✅ Rangos definidos',
-        extra: 'ℹ️ Sin registros  '
+        status: "neutral",
+        message: "✅ Rangos definidos",
+        extra: "ℹ️ Sin registros  ",
       });
 
       await loadLastMeasurement(tank.id, tankSection);
@@ -423,34 +449,31 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     renderTable(data, thresholds);
     renderChart(data);
 
-
     const latest = data[data.length - 1];
     const status = getTankStatus(latest, thresholds);
 
     renderTankStatus(statusEl, {
       status,
       message:
-        status === 'ok'
-          ? '✅ Agua estable'
-          : status === 'warning'
-          ? '⚠️ Revisar parámetros'
-          : '❌ Estado crítico',
-      extra: thresholds?.source === 'auto'
-        ? '🐟 Rangos biológicos activos  '
-        : null
+        status === "ok"
+          ? "✅ Agua estable"
+          : status === "warning"
+            ? "⚠️ Revisar parámetros"
+            : "❌ Estado crítico",
+      extra:
+        thresholds?.source === "auto" ? "🐟 Rangos biológicos activos  " : null,
     });
-
 
     // Detalles de la alerta
     const issues = getTankIssues(latest, thresholds);
-    const detailsEl = document.createElement('ul');
-    detailsEl.className = 'tank-issues';
+    const detailsEl = document.createElement("ul");
+    detailsEl.className = "tank-issues";
 
-    issues.forEach(issue => {
-      const li = document.createElement('li');
+    issues.forEach((issue) => {
+      const li = document.createElement("li");
       const label = WATER_PARAMS[issue.key] || issue.key;
 
-      if (issue.message.includes('>') || issue.message.includes('<')) {
+      if (issue.message.includes(">") || issue.message.includes("<")) {
         li.textContent = `${issue.label} (${issue.message})`;
       } else {
         li.textContent = `${issue.label} ${issue.message}`;
@@ -460,14 +483,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     });
 
     // limpiar anteriores
-    tankSection.querySelectorAll('.tank-issues').forEach(el => el.remove());
+    tankSection.querySelectorAll(".tank-issues").forEach((el) => el.remove());
 
     if (issues.length) {
-      tankSection.querySelector('.tank-status').after(detailsEl);
+      tankSection.querySelector(".tank-status").after(detailsEl);
     }
 
     await loadLastMeasurement(tank.id, tankSection);
-
   }
 
   // Evaluar estado del acuario
@@ -475,21 +497,21 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     let danger = false;
     let warning = false;
 
-    WATER_PARAMS.forEach(param => {
+    WATER_PARAMS.forEach((param) => {
       const v = values[param];
       if (v == null) return;
 
-      if (param === 'amoniaco') {
+      if (param === "amoniaco") {
         const r = evaluateAmmonia(v, values.ph);
-        if (r?.status === 'danger') danger = true;
-        if (r?.status === 'warning') warning = true;
+        if (r?.status === "danger") danger = true;
+        if (r?.status === "warning") warning = true;
         return;
       }
 
       if (ALERT_RANGES[param]) {
         const r = ALERT_RANGES[param].evaluate(v);
-        if (r.status === 'danger') danger = true;
-        if (r.status === 'warning') warning = true;
+        if (r.status === "danger") danger = true;
+        if (r.status === "warning") warning = true;
         return;
       }
 
@@ -500,61 +522,59 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       }
     });
 
-    if (danger) return 'danger';
-    if (warning) return 'warning';
-    return 'ok';
+    if (danger) return "danger";
+    if (warning) return "warning";
+    return "ok";
   }
-
 
   //Función única para pintar el estado
   function renderTankStatus(statusEl, { status, message, extra } = {}) {
-    statusEl.dataset.status = status || 'neutral';
+    statusEl.dataset.status = status || "neutral";
 
     // Limpiar completamente
-    statusEl.innerHTML = '';
+    statusEl.innerHTML = "";
 
-    const text = document.createElement('span');
-    text.className = 'status-text';
-    text.textContent = message || '';
+    const text = document.createElement("span");
+    text.className = "status-text";
+    text.textContent = message || "";
 
     statusEl.appendChild(text);
 
     if (extra) {
-      const extraEl = document.createElement('span');
+      const extraEl = document.createElement("span");
       extraEl.textContent = ` · ${extra}`;
       statusEl.appendChild(extraEl);
     }
 
-    const btn = document.createElement('button');
-    btn.className = 'edit-thresholds-btn';
-    btn.title = 'Editar rangos';
-    btn.textContent = '⚙️';
+    const btn = document.createElement("button");
+    btn.className = "edit-thresholds-btn";
+    btn.title = "Editar rangos";
+    btn.textContent = "⚙️";
 
     statusEl.appendChild(btn);
   }
 
-
   //Añadir información detallada de la alerta encima de la tabla.
-    // Formatear números a dos decimales
+  // Formatear números a dos decimales
   function fmt(n, decimals = 2) {
     const num = Number(n);
     return Number.isNaN(num)
-      ? ''
+      ? ""
       : parseFloat(num.toFixed(decimals)).toString();
   }
 
-    // Etiquetas para los parámetros (temperature => 'Temperatura', etc.)
+  // Etiquetas para los parámetros (temperature => 'Temperatura', etc.)
   const PARAM_LABELS = {
-    temperature: '🌡️ Temperatura (ºC): ',
-    ph: '⚗️ pH: ',
-    gh: '🧪 GH: ',
-    kh: '🧪 KH: ',
-    no2: '☠️ Nitritos (NO₂) (mg/L): ',
-    no3: '☠️ Nitratos (NO₃) (mg/L): ',
-    nh3: '☠️ Amoniaco (NH₃) (mg/L): ',
-    po4: '🌿 Fosfatos (PO₄) (mg/L): ',
-    cl: '🚱 Cloro (Cl) (mg/L): ',
-    hierro: '🔩 Hierro (Fe) (mg/L): '
+    temperature: "🌡️ Temperatura (ºC): ",
+    ph: "⚗️ pH: ",
+    gh: "🧪 GH: ",
+    kh: "🧪 KH: ",
+    no2: "☠️ Nitritos (NO₂) (mg/L): ",
+    no3: "☠️ Nitratos (NO₃) (mg/L): ",
+    nh3: "☠️ Amoniaco (NH₃) (mg/L): ",
+    po: "🌿 Fosfatos (PO₄) (mg/L): ",
+    cl: "🚱 Cloro (Cl) (mg/L): ",
+    hierro: "🔩 Hierro (Fe) (mg/L): ",
   };
 
   function labelFor(key) {
@@ -569,15 +589,15 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       if (value == null) continue;
 
       // AMONIACO → NH3
-      if (key === 'amoniaco') {
+      if (key === "amoniaco") {
         const r = evaluateAmmonia(value, latest.ph);
-        if (r && r.status !== 'ok') {
+        if (r && r.status !== "ok") {
           issues.push({
             key,
             label: labelFor(key),
             status: r.status,
             value,
-            message: r.msg
+            message: r.msg,
           });
         }
         continue;
@@ -586,13 +606,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       // ALERTAS FIJAS (NO2, NO3, PO4, Cl, Fe…)
       if (ALERT_RANGES[key]) {
         const r = ALERT_RANGES[key].evaluate(value);
-        if (r.status !== 'ok') {
+        if (r.status !== "ok") {
           issues.push({
             key,
             label: labelFor(key),
             status: r.status,
             value,
-            message: r.msg
+            message: r.msg,
           });
         }
         continue;
@@ -607,17 +627,17 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           issues.push({
             key,
             label: labelFor(key),
-            status: 'danger',
+            status: "danger",
             value,
-            message: `${fmt(value)} < ${fmt(min)}`
+            message: `${fmt(value)} < ${fmt(min)}`,
           });
         } else if (max != null && value > max) {
           issues.push({
             key,
             label: labelFor(key),
-            status: 'danger',
+            status: "danger",
             value,
-            message: `${fmt(value)} > ${fmt(max)}`
+            message: `${fmt(value)} > ${fmt(max)}`,
           });
         }
       }
@@ -626,22 +646,19 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     return issues;
   }
 
-
-
   // Mapa de nombres para mostrar en los mensajes
   const WATER_PARAMS = [
-    'temperature',
-    'ph',
-    'gh',
-    'kh',
-    'nitratos',
-    'nitritos',
-    'amoniaco',
-    'po',
-    'cl',
-    'hierro'
+    "temperature",
+    "ph",
+    "gh",
+    "kh",
+    "nitratos",
+    "nitritos",
+    "amoniaco",
+    "po",
+    "cl",
+    "hierro",
   ];
-
 
   // Función para mostrar la hora o el día de la última medición
   function timeAgo(dateString) {
@@ -653,7 +670,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const hours = Math.floor(diffMs / 3600000);
     const days = Math.floor(diffMs / 86400000);
 
-    if (minutes < 1) return 'justo ahora';
+    if (minutes < 1) return "justo ahora";
     if (minutes < 60) return `hace ${minutes} min`;
     if (hours < 24) return `hace ${hours} h`;
     return `hace ${days} días`;
@@ -661,17 +678,17 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   async function loadLastMeasurement(tankId, tankSection) {
     const { data } = await supabase
-      .from('water_levels')
-      .select('created_at')
-      .eq('tank_id', tankId)
-      .order('created_at', { ascending: false })
+      .from("water_levels")
+      .select("created_at")
+      .eq("tank_id", tankId)
+      .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    const el = tankSection.querySelector('.last-measurement');
+    const el = tankSection.querySelector(".last-measurement");
 
     if (!data) {
-      el.textContent = 'Sin mediciones';
+      el.textContent = "Sin mediciones";
       return;
     }
 
@@ -682,29 +699,29 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   function renderTable(rows, thresholds) {
     if (!thresholds) return;
     const tbody = document
-      .querySelectorAll('.tank')
-      [index].querySelector('tbody');
+      .querySelectorAll(".tank")
+      [index].querySelector("tbody");
 
-    tbody.innerHTML = '';
+    tbody.innerHTML = "";
 
-    rows.forEach(row => {
-      const tr = document.createElement('tr');
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
 
       tr.innerHTML = `
         <td>${row.date}</td>
 
-        ${renderCell('temperature', row, thresholds)}
-        ${renderCell('ph', row, thresholds)}
-        ${renderCell('gh', row, thresholds)}
-        ${renderCell('kh', row, thresholds)}
-        ${renderCell('nitratos', row, thresholds)}
-        ${renderCell('nitritos', row, thresholds)}
-        ${renderCell('amoniaco', row, thresholds)}
-        ${renderCell('po', row, thresholds)}
-        ${renderCell('cl', row, thresholds)}
-        ${renderCell('hierro', row, thresholds)}
+        ${renderCell("temperature", row, thresholds)}
+        ${renderCell("ph", row, thresholds)}
+        ${renderCell("gh", row, thresholds)}
+        ${renderCell("kh", row, thresholds)}
+        ${renderCell("nitratos", row, thresholds)}
+        ${renderCell("nitritos", row, thresholds)}
+        ${renderCell("amoniaco", row, thresholds)}
+        ${renderCell("po", row, thresholds)}
+        ${renderCell("cl", row, thresholds)}
+        ${renderCell("hierro", row, thresholds)}
 
-        <td>${row.notes ?? ''}</td>
+        <td>${row.notes ?? ""}</td>
         <td class="actions">
           <button 
             class="delete-record-btn"
@@ -720,17 +737,16 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     });
   }
 
-  
   // Eliminar registros
-  document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.delete-record-btn');
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".delete-record-btn");
     if (!btn) return;
 
     const recordId = btn.dataset.id;
     if (!recordId) return;
 
     const confirmDelete = confirm(
-      '¿Eliminar este registro de parámetros? Esta acción no se puede deshacer.'
+      "¿Eliminar este registro de parámetros? Esta acción no se puede deshacer.",
     );
 
     if (!confirmDelete) return;
@@ -740,12 +756,12 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   async function deleteWaterRecord(recordId) {
     const { error } = await supabase
-      .from('water_levels')
+      .from("water_levels")
       .delete()
-      .eq('id', recordId);
+      .eq("id", recordId);
 
     if (error) {
-      alert('Error eliminando el registro');
+      alert("Error eliminando el registro");
       console.error(error);
       return;
     }
@@ -754,37 +770,34 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     await loadTankData();
   }
 
-
-
   // Evaluar el estado de un valor según los umbrales
   function getValueStatus(value, min, max) {
-    if (value === null || value === undefined) return '';
+    if (value === null || value === undefined) return "";
 
     const v = Number(value);
-    if (Number.isNaN(v)) return '';
+    if (Number.isNaN(v)) return "";
 
     // Fuera de rango → peligro
-    if (min !== null && min !== undefined && v < min) return 'danger';
-    if (max !== null && max !== undefined && v > max) return 'danger';
+    if (min !== null && min !== undefined && v < min) return "danger";
+    if (max !== null && max !== undefined && v > max) return "danger";
 
     // Warning si se acerca al límite (10%)
     const range = max !== null && min !== null ? max - min : null;
 
-    if (range && min !== null && v <= min + range * 0.1) return 'warning';
-    if (range && max !== null && v >= max - range * 0.1) return 'warning';
+    if (range && min !== null && v <= min + range * 0.1) return "warning";
+    if (range && max !== null && v >= max - range * 0.1) return "warning";
 
-    return 'ok';
+    return "ok";
   }
-
 
   // Colorear celdas según los thresholds.
   function getCellStatus(param, value, row, thresholds) {
-    if (value === null || value === undefined) return '';
+    if (value === null || value === undefined) return "";
 
     // AMONIACO → NH3
-    if (param === 'amoniaco') {
+    if (param === "amoniaco") {
       const r = evaluateAmmonia(value, row.ph);
-      return r?.status ?? 'ok';
+      return r?.status ?? "ok";
     }
 
     // PARÁMETROS CON ALERTAS FIJAS
@@ -798,13 +811,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
       const min = thresholds[`${param}_min`];
       const max = thresholds[`${param}_max`];
 
-      if (min != null && value < min) return 'danger';
-      if (max != null && value > max) return 'danger';
+      if (min != null && value < min) return "danger";
+      if (max != null && value > max) return "danger";
 
-      return 'ok';
+      return "ok";
     }
 
-    return 'neutral';
+    return "neutral";
   }
 
   function renderCell(param, row, thresholds) {
@@ -816,7 +829,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const status = getCellStatus(param, value, row, thresholds);
 
     // AMONIACO → mostrar NH3
-    if (param === 'amoniaco') {
+    if (param === "amoniaco") {
       const nh3 = calculateNH3(value, row.ph, row.temperature);
 
       return `
@@ -825,7 +838,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           ${
             nh3 !== null
               ? `<div class="nh3-sub">NH₃: ${nh3.toFixed(3)} mg/L</div>`
-              : ''
+              : ""
           }
         </td>
       `;
@@ -834,138 +847,130 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     return `<td class="${status}">${value}</td>`;
   }
 
-
-
-
-
-
-
   // Gráfica de niveles de agua
-  const ctx = document.getElementById('water-chart').getContext('2d');
+  const ctx = document.getElementById("water-chart").getContext("2d");
   let chart;
 
   function renderChart(rows) {
-    const labels = rows.map(r => r.date).reverse();
-    const temperature = rows.map(r => r.temperature).reverse();
-    const ph = rows.map(r => r.ph).reverse();
-    const gh = rows.map(r => r.gh).reverse();
+    const labels = rows.map((r) => r.date).reverse();
+    const temperature = rows.map((r) => r.temperature).reverse();
+    const ph = rows.map((r) => r.ph).reverse();
+    const gh = rows.map((r) => r.gh).reverse();
 
     if (chart) chart.destroy();
 
     chart = new Chart(ctx, {
-      type: 'line',
+      type: "line",
       data: {
         labels,
         datasets: [
           {
-            label: 'Temperatura (°C)',
+            label: "Temperatura (°C)",
             data: temperature,
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'pH',
+            label: "pH",
             data: ph,
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'GH',
+            label: "GH",
             data: gh,
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'KH',
-            data: rows.map(r => r.kh).reverse(),
+            label: "KH",
+            data: rows.map((r) => r.kh).reverse(),
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'Nitratos NO3 (mg/L)',
-            data: rows.map(r => r.nitratos).reverse(),
+            label: "Nitratos NO3 (mg/L)",
+            data: rows.map((r) => r.nitratos).reverse(),
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'Nitritos NO2 (mg/L)',
-            data: rows.map(r => r.nitritos).reverse(),
+            label: "Nitritos NO2 (mg/L)",
+            data: rows.map((r) => r.nitritos).reverse(),
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'Amonio NH4 - Amoniaco NH3 (mg/L)',
-            data: rows.map(r => r.amoniaco).reverse(),
+            label: "Amonio NH4 - Amoniaco NH3 (mg/L)",
+            data: rows.map((r) => r.amoniaco).reverse(),
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'Fosfato PO4 (mg/L)',
-            data: rows.map(r => r.po).reverse(),
+            label: "Fosfato PO4 (mg/L)",
+            data: rows.map((r) => r.po).reverse(),
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'Cloro Cl (mg/L)',
-            data: rows.map(r => r.cl).reverse(),
+            label: "Cloro Cl (mg/L)",
+            data: rows.map((r) => r.cl).reverse(),
             borderWidth: 2,
-            tension: 0.3
+            tension: 0.3,
           },
           {
-            label: 'Hierro Fe (mg/L)',
-            data: rows.map(r => r.hierro).reverse(),
+            label: "Hierro Fe (mg/L)",
+            data: rows.map((r) => r.hierro).reverse(),
             borderWidth: 2,
-            tension: 0.3
-          }
-        ]
+            tension: 0.3,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: { beginAtZero: false }
-        }
-      }
+          y: { beginAtZero: false },
+        },
+      },
     });
   }
 
-
   // Script para añadir acuarios
-  const tankForm = document.getElementById('tank-form');
-  const addTankBtn = document.getElementById('add-tank');
+  const tankForm = document.getElementById("tank-form");
+  const addTankBtn = document.getElementById("add-tank");
 
-  addTankBtn.addEventListener('click', () => {
-    tankForm.classList.toggle('is-open');
-    tankForm.scrollIntoView({ behavior: 'smooth' });
+  addTankBtn.addEventListener("click", () => {
+    tankForm.classList.toggle("is-open");
+    tankForm.scrollIntoView({ behavior: "smooth" });
   });
 
-  tankForm.addEventListener('submit', async (e) => {
+  tankForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(tankForm);
 
     const { data, error } = await supabase
-      .from('tanks')
+      .from("tanks")
       .insert({
-        name: fd.get('name'),
-        volume_l: fd.get('volume_l') || null
+        name: fd.get("name"),
+        volume_l: fd.get("volume_l") || null,
       })
       .select()
       .single();
-      
-      // Insertar valores por defecto de los rangos de alerta
-      await supabase.from('tank_thresholds').insert({
-        tank_id: data.id,
 
-        nitratos_max: 40,
-        nitritos_max: 0,
-        amoniaco_max: 0,
-        po_max: 0.5,
-        cl_max: 0,
-        hierro_max: 0.5,
+    // Insertar valores por defecto de los rangos de alerta
+    await supabase.from("tank_thresholds").insert({
+      tank_id: data.id,
 
-        source: 'manual'
-      });
+      nitratos_max: 40,
+      nitritos_max: 0,
+      amoniaco_max: 0,
+      po_max: 0.5,
+      cl_max: 0,
+      hierro_max: 0.5,
 
+      source: "manual",
+    });
 
     if (error) {
       alert(error.message);
@@ -973,20 +978,19 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     }
 
     tankForm.reset();
-    tankForm.classList.remove('is-open');
+    tankForm.classList.remove("is-open");
 
     await loadTanks(); // clave
   });
 
   // Cargar acuarios desde la base de datos y crear secciones
-  const tankTrack = document.getElementById('tank-track');
-  
+  const tankTrack = document.getElementById("tank-track");
 
   async function loadTanks() {
     const { data, error } = await supabase
-      .from('tanks')
-      .select('*')
-      .order('created_at', { ascending: true });
+      .from("tanks")
+      .select("*")
+      .order("created_at", { ascending: true });
 
     if (error) {
       console.error(error);
@@ -994,15 +998,15 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     }
 
     tanksData = data;
-    tankTrack.innerHTML = '';
+    tankTrack.innerHTML = "";
 
-    data.forEach(tank => {
-      const section = document.createElement('section');
-      section.className = 'tank';
+    data.forEach((tank) => {
+      const section = document.createElement("section");
+      section.className = "tank";
       section.dataset.tankId = tank.id;
 
       section.innerHTML = `
-        <h2>${tank.name}${tank.volume_l ? ` (${tank.volume_l}L)` : ''}</h2>
+        <h2>${tank.name}${tank.volume_l ? ` (${tank.volume_l}L)` : ""}</h2>
         <div class="tank-fish">
           <h3 class="title-list">Peces en este acuario:</h3>
           <ul class="fish-list"></ul>
@@ -1031,13 +1035,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
               <span>Máx</span>
             </div>
 
-            ${thresholdRow('temperature', 'Temperatura (°C)')}
-            ${thresholdRow('ph', 'pH')}
-            ${thresholdRow('gh', 'GH')}
-            ${thresholdRow('kh', 'KH')}
-            ${thresholdRow('nitratos', 'Nitratos')}
-            ${thresholdRow('nitritos', 'Nitritos')}
-            ${thresholdRow('amoniaco', 'Amoniaco')}
+            ${thresholdRow("temperature", "Temperatura (°C)")}
+            ${thresholdRow("ph", "pH")}
+            ${thresholdRow("gh", "GH")}
+            ${thresholdRow("kh", "KH")}
+            ${thresholdRow("nitratos", "Nitratos")}
+            ${thresholdRow("nitritos", "Nitritos")}
+            ${thresholdRow("amoniaco", "Amoniaco")}
           </div>
 
           <div class="threshold-actions">
@@ -1077,12 +1081,12 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   }
   await loadTanks();
 
-  tankTrack.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.edit-thresholds-btn');
+  tankTrack.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".edit-thresholds-btn");
     if (!btn) return;
 
-    const tankSection = btn.closest('.tank');
-    const form = tankSection.querySelector('.thresholds-form');
+    const tankSection = btn.closest(".tank");
+    const form = tankSection.querySelector(".thresholds-form");
     const tankId = tankSection.dataset.tankId;
 
     form.hidden = !form.hidden;
@@ -1095,31 +1099,31 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
   function fillThresholdForm(form, thresholds) {
     for (const key in thresholds) {
-      if (!key.endsWith('_min') && !key.endsWith('_max')) continue;
+      if (!key.endsWith("_min") && !key.endsWith("_max")) continue;
       const input = form.querySelector(`[name="${key}"]`);
-      if (input) input.value = thresholds[key] ?? '';
+      if (input) input.value = thresholds[key] ?? "";
     }
   }
 
-  tankTrack.addEventListener('submit', async (e) => {
-    const form = e.target.closest('.thresholds-form');
+  tankTrack.addEventListener("submit", async (e) => {
+    const form = e.target.closest(".thresholds-form");
     if (!form) return;
 
     e.preventDefault();
 
-    const tankSection = form.closest('.tank');
+    const tankSection = form.closest(".tank");
     const tankId = tankSection.dataset.tankId;
     const fd = new FormData(form);
 
     const payload = { tank_id: tankId };
 
     for (const [key, value] of fd.entries()) {
-      payload[key] = value === '' ? null : Number(value);
+      payload[key] = value === "" ? null : Number(value);
     }
 
     const { data, error } = await supabase
-      .from('tank_thresholds')
-      .upsert(payload, { onConflict: 'tank_id' })
+      .from("tank_thresholds")
+      .upsert(payload, { onConflict: "tank_id" })
       .select()
       .single();
 
@@ -1132,10 +1136,10 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     form.hidden = true;
 
-    const statusEl = tankSection.querySelector('.tank-status');
+    const statusEl = tankSection.querySelector(".tank-status");
     renderTankStatus(statusEl, {
-      status: 'ok',
-      message: '✔ Rangos configurados'
+      status: "ok",
+      message: "✔ Rangos configurados",
     });
   });
 
@@ -1149,17 +1153,16 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     `;
   }
 
-
   //Calcular los rangos óptimos del acuario según los peces que contiene
   function computeTankThresholds(fishes) {
-    const params = ['temperature', 'ph', 'gh', 'kh'];
+    const params = ["temperature", "ph", "gh", "kh"];
     const result = {};
 
     for (const param of params) {
       const mins = [];
       const maxs = [];
 
-      fishes.forEach(row => {
+      fishes.forEach((row) => {
         const fish = row.fish;
         if (!fish) return;
 
@@ -1181,7 +1184,6 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     return result;
   }
 
-
   //Guardar los rangos calculados automáticamente
   async function updateTankThresholdsFromFish(tankId) {
     const fishes = await fetchTankFish(tankId);
@@ -1191,13 +1193,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     const payload = {
       tank_id: tankId,
-      source: 'auto',
-      ...bioThresholds
+      source: "auto",
+      ...bioThresholds,
     };
 
     const { error } = await supabase
-      .from('tank_thresholds')
-      .upsert(payload, { onConflict: 'tank_id' });
+      .from("tank_thresholds")
+      .upsert(payload, { onConflict: "tank_id" });
 
     if (error) {
       console.error(error);
@@ -1206,13 +1208,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     }
   }
 
-
   async function fetchTankFish(tankId) {
     if (!tankId) return [];
 
     const { data, error } = await supabase
-      .from('tank_fish')
-      .select(`
+      .from("tank_fish")
+      .select(
+        `
         quantity,
         sex,
         fish:fish_id (
@@ -1227,9 +1229,9 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           kh_min,
           kh_max
         )
-      `)
-      .eq('tank_id', tankId)
-    ;
+      `,
+      )
+      .eq("tank_id", tankId);
 
     if (error) {
       console.error(error);
@@ -1239,17 +1241,14 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     return data ?? [];
   }
 
-
   async function renderTankFish(tank) {
     const fishes = await fetchTankFish(tank.id);
 
-    const section = document.querySelector(
-      `.tank[data-tank-id="${tank.id}"]`
-    );
+    const section = document.querySelector(`.tank[data-tank-id="${tank.id}"]`);
     if (!section) return;
 
-    const list = section.querySelector('.fish-list');
-    list.innerHTML = '';
+    const list = section.querySelector(".fish-list");
+    list.innerHTML = "";
 
     if (!fishes.length) {
       list.innerHTML = '<li class="empty">No hay peces asignados</li>';
@@ -1259,13 +1258,13 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     // Agrupar por especie
     const grouped = {};
 
-    fishes.forEach(row => {
+    fishes.forEach((row) => {
       if (!row.fish) return;
-      
+
       const cleanName = row.fish.nombre_comun.split('"')[0].trim(); //quitar todo lo que venga después de las comillas en el nombre común
       row.fish.nombre_comun = cleanName;
       const name = row.fish.nombre_comun;
-      const sex = row.sex || 'Indeterminado';
+      const sex = row.sex || "Indeterminado";
       const qty = row.quantity ?? 1;
 
       if (!grouped[name]) {
@@ -1274,7 +1273,7 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
           Macho: 0,
           Hembra: 0,
           Hermafrodita: 0,
-          Indeterminado: 0
+          Indeterminado: 0,
         };
       }
 
@@ -1284,17 +1283,14 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 
     // Render
     Object.entries(grouped).forEach(([name, data]) => {
-      const li = document.createElement('li');
+      const li = document.createElement("li");
 
       const sexDetails = [];
       if (data.Macho) sexDetails.push(`${data.Macho}♂`);
       if (data.Hembra) sexDetails.push(`${data.Hembra}♀`);
       if (data.Hermafrodita) sexDetails.push(`${data.Hermafrodita}⚥`);
       console.log(sexDetails);
-      const suffix =
-        sexDetails.length
-          ? ` (${sexDetails.join(' y ')})`
-          : '';
+      const suffix = sexDetails.length ? ` (${sexDetails.join(" y ")})` : "";
 
       li.textContent = `${name} × ${data.total}${suffix}`;
       list.appendChild(li);
@@ -1302,25 +1298,23 @@ const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
   }
 
   //Enfocar inicio de página en el div de niveles de agua
-  window.addEventListener('load', () => {
+  window.addEventListener("load", () => {
     const firstTank = document.querySelector('.water-levels[data-index="0"]');
 
     if (firstTank) {
       firstTank.scrollIntoView({
-        block: 'start',
-        inline: 'nearest',
-        behavior: 'auto'
+        block: "start",
+        inline: "nearest",
+        behavior: "auto",
       });
     }
   });
-  window.addEventListener('load', () => {
+  window.addEventListener("load", () => {
     const firstTank = document.querySelector('.water-levels[data-index="0"]');
     if (!firstTank) return;
 
     requestAnimationFrame(() => {
-      firstTank.scrollIntoView({ block: 'start' });
+      firstTank.scrollIntoView({ block: "start" });
     });
   });
-
-
 </script>

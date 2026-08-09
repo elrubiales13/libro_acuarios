@@ -1,58 +1,72 @@
 
-const config = document.getElementById("app-config");
-
-const BASE_URL = config?.dataset.base ?? "/";
-
-console.log("BASE_URL:", BASE_URL);
-
-
 const initFab = () => {
   const fab = document.querySelector(".fab");
 
   if (!fab) return;
-  // Avoid double-initializing handlers
-  if (window.__fabInitialized) return;
-  window.__fabInitialized = true;
 
   const fabToggle = document.getElementById("fabToggle");
   const addBtn = document.getElementById("add-page-btn");
-  const modal = document.getElementById("modal-backdrop");
   const waterBtn = document.getElementById("waterLevels");
+  const waterGuideBtn = document.getElementById("waterGuide");
 
   // Toggle FAB
-  fabToggle?.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    fab.classList.toggle("open");
-  });
+  if (fabToggle && !fabToggle.dataset.bound) {
+    fabToggle.dataset.bound = "true";
+    fabToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fab.classList.toggle("open");
+    });
+  }
 
-  // Botón "+"
-  addBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (window.openFishModal) {
-      window.openFishModal({ mode: "create" });
-    }
-  });
+  // Botón "+" (Añadir pez)
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = "true";
+    addBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fab.classList.remove("open");
+      if (window.openFishModal) {
+        window.openFishModal({ mode: "create" });
+      }
+    });
+  }
 
   // Botón water-levels
-  waterBtn?.addEventListener("click", (e) => {
-    e.preventDefault();
-    fab.classList.remove("open");
-    const base = document.getElementById("app-config")?.dataset.base ?? "/";
-    window.location.href = `${base}water-levels`;
-  });
-
-  // Click fuera → cerrar
-  document.addEventListener("click", (ev) => {
-    if (!fab.contains(ev.target)) {
+  if (waterBtn && !waterBtn.dataset.bound) {
+    waterBtn.dataset.bound = "true";
+    waterBtn.addEventListener("click", (e) => {
+      e.preventDefault();
       fab.classList.remove("open");
-    }
-  });
+      const base = document.getElementById("app-config")?.dataset.base ?? "/";
+      window.location.href = `${base}water-levels`;
+    });
+  }
+
+  // Botón water-guide
+  if (waterGuideBtn && !waterGuideBtn.dataset.bound) {
+    waterGuideBtn.dataset.bound = "true";
+    waterGuideBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      fab.classList.remove("open");
+      const base = document.getElementById("app-config")?.dataset.base ?? "/";
+      window.location.href = `${base}water-guide`;
+    });
+  }
+
+  // Click fuera → cerrar menu
+  if (!document.datasetHasFabClose) {
+    document.datasetHasFabClose = true;
+    document.addEventListener("click", (ev) => {
+      const activeFab = document.querySelector(".fab");
+      if (activeFab && !activeFab.contains(ev.target)) {
+        activeFab.classList.remove("open");
+      }
+    });
+  }
 };
 
 // inicial
 initFab();
-
-// reinicializar tras render SPA
+document.addEventListener("DOMContentLoaded", initFab);
 document.addEventListener("spa:render", initFab);

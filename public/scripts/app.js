@@ -69,14 +69,14 @@ const renderFish = (fish) => {
         <p><strong>Origen:</strong> ${fish.origen ?? "-"}</p>
         <p><strong>Color:</strong> ${fish.color ?? "-"}</p>
         <p><strong>Sexo:</strong> ${fish.sexo ?? "-"}</p>
-        <p><strong>Tamaño adulto:</strong> ${fish.tamano_adulto ?? "-"}</p>
+        <p><strong>Tamaño adulto:</strong> ${fish.tamano_adulto ? fish.tamano_adulto + " cm" : "-"}</p>
       </section>
 
       <section class="fish-water">
-        <p><strong>Temperatura:</strong> ${fish.temperature_min}–${fish.temperature_max} °C</p>
-        <p><strong>pH:</strong> ${fish.ph_min}–${fish.ph_max}</p>
-        <p><strong>GH:</strong> ${fish.gh_min}–${fish.gh_max}</p>
-        <p><strong>KH:</strong> ${fish.kh_min}–${fish.kh_max}</p>
+        <p><strong>Temperatura:</strong> ${fish.temperature_min ?? "-"}–${fish.temperature_max ?? "-"} °C</p>
+        <p><strong>pH:</strong> ${fish.ph_min ?? "-"}–${fish.ph_max ?? "-"}</p>
+        <p><strong>GH:</strong> ${fish.gh_min ?? "-"}–${fish.gh_max ?? "-"}</p>
+        <p><strong>KH:</strong> ${fish.kh_min ?? "-"}–${fish.kh_max ?? "-"}</p>
       </section>
 
       <section class="fish-extra">
@@ -85,6 +85,20 @@ const renderFish = (fish) => {
         <p><strong>Compatibilidad:</strong> ${fish.compatibilidad ?? "-"}</p>
         <p><strong>Reproducción:</strong> ${fish.reproduccion ?? "-"}</p>
       </section>
+
+      <section class="fish-history">
+        <p><strong>Adquirido en:</strong> ${fish.comprado_en ?? "-"}</p>
+        <p><strong>Incorporación:</strong> ${fish.fecha_incorporacion ?? "-"}</p>
+        ${fish.fecha_fallecimiento ? `<p><strong>Fallecimiento:</strong> ${fish.fecha_fallecimiento}</p>` : ""}
+        ${fish.causa_muerte ? `<p><strong>Causa muerte:</strong> ${fish.causa_muerte}</p>` : ""}
+      </section>
+
+      ${fish.curiosidades ? `
+        <section class="fish-curiosities">
+          <p><strong>Curiosidades:</strong></p>
+          <p>${fish.curiosidades}</p>
+        </section>` : ""
+      }
 
       ${fish.notas_adicionales ? `
         <section class="fish-notes">
@@ -201,6 +215,11 @@ store.subscribe(({ fishes, currentPage, loaded }) => {
     qs("#nav-next").style.visibility =
         currentPage < fishes.length ? "visible" : "hidden";
 
+    const navIndex = qs("#nav-index");
+    if (navIndex) {
+        navIndex.style.visibility = currentPage > 0 ? "visible" : "hidden";
+    }
+
     document.dispatchEvent(new Event("spa:render"));
 
 });
@@ -224,6 +243,12 @@ qs("#nav-prev").addEventListener("click", (e) => {
     setUrl(currentPage - 1);
     store.setState({ currentPage: currentPage - 1 });
   }
+});
+
+qs("#nav-index")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  setUrl(0);
+  store.setState({ currentPage: 0 });
 });
 
 qs("#nav-next").addEventListener("click", (e) => {

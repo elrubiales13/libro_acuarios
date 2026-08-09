@@ -1,0 +1,1162 @@
+---
+import FullPageLayout from "../layouts/FullPageLayout.astro";
+export const prerender = true;
+
+const BASE = import.meta.env.BASE_URL;
+---
+
+<FullPageLayout title="Guía Rápida y Soluciones de Valores de Agua – Sera aqua-test box">
+  <div class="guide-container">
+    
+    <!-- Hero Header -->
+    <header class="guide-header">
+      <div class="guide-header-badge">📘 Manual de Usuario & Soluciones</div>
+      <h1>🌊 Guía Rápida de Valores de Agua</h1>
+      <p class="guide-subtitle">Sera aqua-test box — Instrucciones paso a paso, diagnósticos y guía de soluciones</p>
+      
+      <!-- Aviso Importante -->
+      <div class="notice-box important">
+        <div class="notice-icon">💡</div>
+        <div class="notice-text">
+          <strong>Importante:</strong> Siempre agita bien los reactivos antes de usar. Limpia las cubetas con agua del grifo antes y después de cada test. Observa los colores con luz diurna natural sin sol directo.
+        </div>
+      </div>
+
+      <!-- Navegación Rápida (Chips) -->
+      <nav class="quick-nav">
+        <span class="quick-nav-label">Ir a:</span>
+        <a href="#seguridad" class="chip chip-safety">⚠️ Seguridad</a>
+        <a href="#tests" class="chip">🔬 Tests</a>
+        <a href="#limpieza" class="chip chip-cleaning">🧹 Limpieza</a>
+        <a href="#soluciones" class="chip chip-solutions">💊 Soluciones de Agua</a>
+        <a href="#diagnostico" class="chip chip-diagnostic">🔄 Diagnóstico</a>
+      </nav>
+    </header>
+
+    <!-- Sección Seguridad Primero -->
+    <section id="seguridad" class="guide-card safety-card">
+      <div class="card-header">
+        <h2>⚠️ Seguridad Primero</h2>
+      </div>
+      <div class="table-responsive">
+        <table class="safety-table">
+          <thead>
+            <tr>
+              <th>Reactivo</th>
+              <th>Peligro</th>
+              <th>Precaución</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Reactivo 3 (pH/KH)</strong></td>
+              <td><span class="badge badge-danger">Hidróxido de sodio – Quemaduras graves</span></td>
+              <td>Usa guantes y protección ocular</td>
+            </tr>
+            <tr>
+              <td><strong>Reactivo 1 (Nitrito/Nitrato/Fosfato)</strong></td>
+              <td><span class="badge badge-warning">Ácido clorhídrico/sulfúrico – Corrosivo</span></td>
+              <td>Evita contacto con piel y ojos</td>
+            </tr>
+            <tr>
+              <td><strong>Todos los reactivos</strong></td>
+              <td><span class="badge badge-info">Seguridad infantil / Almacenamiento</span></td>
+              <td>Mantener fuera del alcance de niños. Guardar bajo llave a temperatura ambiente.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Sección Test por Paso a Paso -->
+    <section id="tests" class="tests-section">
+      <div class="section-title">
+        <h2>🔬 Tests Paso a Paso</h2>
+      </div>
+
+      <!-- 1. pH -->
+      <article id="test-ph" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">1</div>
+          <div class="test-title-group">
+            <h3>Test de pH</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Un pH estable requiere KH ≥ 5° dKH. Sin esto, el pH puede caer peligrosamente.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga la cubeta con el agua a medir → Llena hasta <strong>5 ml</strong></li>
+            <li>Añade <strong>4 gotas</strong> del reactivo y mezcla bien</li>
+            <li>Compara el color inmediatamente sobre la escala de colores</li>
+            <li>Limpia la cubeta con agua del grifo</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 2. GH -->
+      <article id="test-gh" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">2</div>
+          <div class="test-title-group">
+            <h3>Test de GH – Dureza Total</h3>
+            <span class="water-type-badge fresh-only">Agua dulce</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Determina la cantidad de calcio y magnesio. Muy elevada → afecta a peces de agua blanda.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>5 ml</strong></li>
+            <li>Añade reactivo gota a gota, agitando tras cada una</li>
+            <li>Cuenta las gotas hasta que el color cambie: <span class="color-indicator red">Rojo</span> → <span class="color-indicator brown">Marrón</span> → <span class="color-indicator green">Verde intenso</span></li>
+            <li>Número de gotas = <strong>°dGH</strong> (ej: 5 gotas = 5° dGH)</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 3. KH -->
+      <article id="test-kh" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">3</div>
+          <div class="test-title-group">
+            <h3>Test de KH – Dureza de Carbonatos</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Estabiliza el pH. KH bajo (&lt;5° dKH) causa fluctuaciones de acidez.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>5 ml</strong></li>
+            <li>Añade reactivo gota a gota, agitando tras cada una</li>
+            <li>Cuenta gotas hasta cambio de color: <span class="color-indicator blue">Azul</span> → <span class="color-indicator green">Verde</span> → <span class="color-indicator yellow">Amarillo puro</span></li>
+            <li>Número de gotas = <strong>°dKH</strong></li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 4. NH4/NH3 -->
+      <article id="test-nh" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">4</div>
+          <div class="test-title-group">
+            <h3>Test de Amonio/Amoníaco NH₄/NH₃</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters danger-text">
+          <strong>¿Por qué importa?</strong> El amoníaco (NH₃) es altamente tóxico para las branquias incluso en 0.02 mg/l.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>10 ml</strong> (agua dulce) o <strong>5 ml</strong> (agua salada)</li>
+            <li>Añade <strong>6 gotas</strong> reactivo 1 + mezcla</li>
+            <li>Añade <strong>6 gotas</strong> reactivo 2 + mezcla</li>
+            <li>Añade <strong>6 gotas</strong> reactivo 3 + mezcla</li>
+            <li>Espera <strong>5 minutos</strong> → Compara color con escala</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 5. NO2 -->
+      <article id="test-no2" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">5</div>
+          <div class="test-title-group">
+            <h3>Test de Nitrito NO₂</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Producto intermedio de descomposición. Bacterias del filtro deberían convertirlo en nitrato.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>5 ml</strong></li>
+            <li>Añade <strong>5 gotas</strong> reactivo 1 + <strong>5 gotas</strong> reactivo 2</li>
+            <li>Agita suavemente</li>
+            <li>Espera <strong>5 minutos</strong> → Compara color</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 6. NO3 -->
+      <article id="test-no3" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">6</div>
+          <div class="test-title-group">
+            <h3>Test de Nitrato NO₃</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Valores &gt;50 mg/l provocan proliferación de algas y deterioro de plantas/peces.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>10 ml</strong></li>
+            <li>Añade <strong>6 gotas</strong> reactivo 1 + mezcla</li>
+            <li>Añade <strong>6 gotas</strong> reactivo 2 + mezcla</li>
+            <li>Añade <strong>1 cucharada rasa</strong> reactivo 3 (cuchara roja)</li>
+            <li>Cierra y agita <strong>15 segundos exactos</strong></li>
+            <li>Añade <strong>6 gotas</strong> reactivo 4 + mezcla</li>
+            <li>Espera <strong>5 minutos</strong> → Compara color</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 7. PO4 -->
+      <article id="test-po4" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">7</div>
+          <div class="test-title-group">
+            <h3>Test de Fosfato PO₄</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Alto fosfato + alto nitrato = crecimiento excesivo de algas.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>10 ml</strong></li>
+            <li>Añade <strong>6 gotas</strong> reactivo 1 + inclina cubeta</li>
+            <li>Añade <strong>6 gotas</strong> reactivo 2 + inclina cubeta</li>
+            <li>Añade <strong>1 cucharada colmada</strong> reactivo 3 (cuchara blanca) + agita brevemente</li>
+            <li>Espera <strong>5 minutos</strong> → Compara color</li>
+          </ol>
+        </div>
+        <div class="dilution-box">
+          <h4>💧 Diluciones para valores altos:</h4>
+          <ul>
+            <li><strong>Color azul oscuro (&gt;2.0 mg/l):</strong> repite con 5 ml agua + 5 ml agua destilada.</li>
+            <li><strong>Si sigue azul oscuro:</strong> repite con 2 ml agua + 8 ml agua destilada (hasta 10.0 mg/l).</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 8. Fe -->
+      <article id="test-fe" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">8</div>
+          <div class="test-title-group">
+            <h3>Test de Hierro Fe</h3>
+            <span class="water-type-badge fresh-only">Agua dulce</span>
+          </div>
+        </div>
+        <div class="why-matters">
+          <strong>¿Por qué importa?</strong> Nutriente esencial para plantas. &gt;0.5 mg/l perjudica a los peces.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>5 ml</strong></li>
+            <li>Añade <strong>2 cucharadas colmadas</strong> reactivo 1 (cuchara blanca) + agita</li>
+            <li>Añade <strong>5 gotas</strong> reactivo 2 + inclina cubeta</li>
+            <li>Espera <strong>10 minutos</strong> → Compara color</li>
+          </ol>
+        </div>
+      </article>
+
+      <!-- 9. Cl -->
+      <article id="test-cl" class="guide-card test-card">
+        <div class="test-card-header">
+          <div class="test-number">9</div>
+          <div class="test-title-group">
+            <h3>Test de Cloro Cl</h3>
+            <span class="water-type-badge fresh-salt">Agua dulce y salada</span>
+          </div>
+        </div>
+        <div class="why-matters danger-text">
+          <strong>¿Por qué importa?</strong> Destruye bacterias del filtro y afecta gravemente las branquias de los peces.
+        </div>
+        <div class="test-steps">
+          <h4>Pasos:</h4>
+          <ol>
+            <li>Enjuaga cubeta → Llena hasta <strong>10 ml</strong></li>
+            <li>Añade <strong>8 gotas</strong> reactivo + mezcla</li>
+            <li>Compara color inmediatamente sobre fondo blanco</li>
+          </ol>
+        </div>
+        <div class="results-box">
+          <h4>📊 Resultados:</h4>
+          <div class="result-items">
+            <div class="result-item result-ok">
+              <span class="result-status">Sin cambio</span>
+              <span class="result-desc">Agua sin cloro tóxico ✅</span>
+            </div>
+            <div class="result-item result-warn">
+              <span class="result-status">Amarillento</span>
+              <span class="result-desc">Cloro detectable desde 0.02 mg/l ⚠️</span>
+            </div>
+            <div class="result-item result-danger">
+              <span class="result-status">Rojizo</span>
+              <span class="result-desc">Concentración alta de cloro ❌</span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Sección Limpieza -->
+    <section id="limpieza" class="guide-card cleaning-card">
+      <div class="card-header">
+        <h2>🧹 Protocolo de Limpieza Universal</h2>
+      </div>
+      <div class="cleaning-content">
+        <p class="cleaning-subtitle">Antes y después de <strong>CADA</strong> test:</p>
+        <ul class="cleaning-list">
+          <li>
+            <span class="bullet-icon">🚰</span>
+            <div>Enjuaga la cubeta con agua del grifo varias veces</div>
+          </li>
+          <li>
+            <span class="bullet-icon">🧻</span>
+            <div>Seca la parte exterior con un paño limpio o papel</div>
+          </li>
+          <li>
+            <span class="bullet-icon">🚫</span>
+            <div><strong>No intercambies tapas</strong> entre frascos de reactivos</div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SECCIÓN SOLUCIONES PARA VALORES DE AGUA -->
+    <section id="soluciones" class="solutions-main-section">
+      <div class="section-title">
+        <h2>🌊 Guía de Soluciones para Valores de Agua en Acuarios</h2>
+      </div>
+
+      <!-- Protocolo de Emergencia General -->
+      <div class="guide-card emergency-banner">
+        <div class="emergency-header">
+          <h3>⚠️ Protocolo de Emergencia General</h3>
+        </div>
+        <div class="golden-rule">
+          <strong>Regla de oro:</strong> Cualquier solución química debe complementarse con cambios parciales de agua y limpieza del filtro. Nunca dosifiques productos sin identificar primero la causa raíz.
+        </div>
+      </div>
+
+      <!-- Tabla de Respuestas Rápidas por Parámetro -->
+      <div class="guide-card">
+        <div class="card-header">
+          <h3>📋 Tabla de Respuestas Rápidas por Parámetro</h3>
+        </div>
+        <div class="table-responsive">
+          <table class="solutions-quick-table">
+            <thead>
+              <tr>
+                <th>Parámetro</th>
+                <th>Valor Crítico</th>
+                <th>Acción Inmediata</th>
+                <th>Solución a Largo Plazo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>NH₃ / NH₄⁺</strong></td>
+                <td><span class="badge badge-danger">≥ 0.02 mg/l NH₃</span></td>
+                <td>Cambio 30% agua + desintoxicante</td>
+                <td>Mejorar filtración biológica</td>
+              </tr>
+              <tr>
+                <td><strong>NO₂</strong></td>
+                <td><span class="badge badge-danger">≥ 0.5 mg/l</span></td>
+                <td>Cambio 30% agua + bacterias</td>
+                <td>Revisar / sostener filtro</td>
+              </tr>
+              <tr>
+                <td><strong>NO₃</strong></td>
+                <td><span class="badge badge-warning">≥ 50 mg/l</span></td>
+                <td>Cambio 50% agua</td>
+                <td>Plantas de crecimiento rápido</td>
+              </tr>
+              <tr>
+                <td><strong>PO₄</strong></td>
+                <td><span class="badge badge-warning">≥ 1.0 mg/l (dulce)</span></td>
+                <td>Cambio 25% agua + resinas</td>
+                <td>Controlar alimentación</td>
+              </tr>
+              <tr>
+                <td><strong>Cu</strong></td>
+                <td><span class="badge badge-danger">≥ 0.3 mg/l</span></td>
+                <td>Cambio parcial + quelante</td>
+                <td>Revisar tuberías / medicamentos</td>
+              </tr>
+              <tr>
+                <td><strong>pH</strong></td>
+                <td><span class="badge badge-danger">&lt; 6.0 o &gt; 9.0</span></td>
+                <td>Cambio progresivo agua RO</td>
+                <td>Regular KH como buffer</td>
+              </tr>
+              <tr>
+                <td><strong>Cloro</strong></td>
+                <td><span class="badge badge-warning">Detectable (&gt;0.02 mg/l)</span></td>
+                <td>Acondicionador inmediato</td>
+                <td>Dejar reposar agua 24h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Soluciones Detalladas por Parámetro -->
+      <div class="solutions-details-grid">
+
+        <!-- 1. Amoníaco/Amonio -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">1</span>
+            <h3>AMONÍACO / AMONIO (NH₃/NH₄⁺)</h3>
+          </div>
+          <div class="danger-callout">
+            🚨 <strong>Peligro crítico:</strong> ≥ 0.02 mg/l de NH₃ tóxico para branquias.
+          </div>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Nivel NH₃ (mg/l)</th>
+                  <th>Gravedad</th>
+                  <th>Solución Inmediata</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0.0 – 0.02</td>
+                  <td><span class="badge badge-info">✅ Seguro</span></td>
+                  <td>Monitoreo continuo</td>
+                </tr>
+                <tr>
+                  <td>0.02 – 0.1</td>
+                  <td><span class="badge badge-warning">⚠️ Moderado</span></td>
+                  <td>Cambio 25% agua + desintoxicante</td>
+                </tr>
+                <tr>
+                  <td>0.1 – 0.5</td>
+                  <td><span class="badge badge-danger">❌ Alto</span></td>
+                  <td>Cambio 40% agua + bacterias nitrificantes</td>
+                </tr>
+                <tr>
+                  <td>&gt; 0.5</td>
+                  <td><span class="badge badge-danger">☠️ Crítico</span></td>
+                  <td>Cambio 50% + aislado + soporte respiratorio</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sol-block">
+            <h4>Soluciones disponibles en mercado:</h4>
+            <ul>
+              <li><strong>Desintoxicantes:</strong> Seachem Prime, API Ammonia Detox, Tetra AquaSafe (neutralizan NH₃ temporalmente).</li>
+              <li><strong>Bacterias nitrificantes:</strong> Tetra Bactozym, JBL Denitrol, API Stress Zyme.</li>
+              <li><strong>Resinas:</strong> Seachem Ammonia Adsorbent (capturan amoníaco libre).</li>
+            </ul>
+          </div>
+          <div class="sol-block">
+            <h4>Prevención a largo plazo:</h4>
+            <ul class="check-bullet-list">
+              <li>✓ Cambios semanales del 20-30%</li>
+              <li>✓ Reducir sobrealimentación (comida consumida en &lt; 3 min)</li>
+              <li>✓ Añadir plantas vivas (absorben NH₄⁺ naturalmente)</li>
+              <li>✓ Limpiar sustrato semanalmente (aspirado de fondo)</li>
+              <li>✓ Verificar carga biológica (espacio / peces)</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 2. Nitritos -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">2</span>
+            <h3>NITRITOS (NO₂)</h3>
+          </div>
+          <p class="sol-desc">🚗 Producto intermedio del ciclo del nitrógeno.</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Nivel NO₂ (mg/l)</th>
+                  <th>Estado</th>
+                  <th>Solución</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0.0</td>
+                  <td><span class="badge badge-info">✅ Ideal</span></td>
+                  <td>Mantener rutina</td>
+                </tr>
+                <tr>
+                  <td>0.0 – 0.5</td>
+                  <td><span class="badge badge-warning">⚠️ Bajo</span></td>
+                  <td>Bacterias + cambio 20%</td>
+                </tr>
+                <tr>
+                  <td>0.5 – 1.0</td>
+                  <td><span class="badge badge-danger">❌ Perjudicial</span></td>
+                  <td>Cambio 30% + bacterias + dejar de alimentar</td>
+                </tr>
+                <tr>
+                  <td>1.0 – 2.0</td>
+                  <td><span class="badge badge-danger">☠️ Peligroso</span></td>
+                  <td>Cambio 40% + aislar peces sensibles</td>
+                </tr>
+                <tr>
+                  <td>&gt; 2.0</td>
+                  <td><span class="badge badge-danger">💀 Crítico</span></td>
+                  <td>Cambio 50% cada 12h + hospitalización</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sol-block">
+            <h4>Productos alternativos:</h4>
+            <ul>
+              <li><strong>Bacterias:</strong> Tetra Nitrasafe, API Nitrite Destroyer, Bio-Rx (JBL).</li>
+              <li><strong>Sal (solo agua dulce):</strong> 1-2 g/l de sal de acuario ayuda a reducir el estrés por nitritos.</li>
+              <li><strong>Carbón activado:</strong> Elimina compuestos orgánicos disueltos.</li>
+            </ul>
+          </div>
+          <div class="sol-block">
+            <h4>Causas comunes:</h4>
+            <ul>
+              <li>Ciclo incompleto del acuario (&lt; 30 días)</li>
+              <li>Sobrealimentación excesiva</li>
+              <li>Muerte de pez no detectada</li>
+              <li>Limpieza excesiva del filtro (elimina bacterias beneficiosas)</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 3. Nitratos -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">3</span>
+            <h3>NITRATOS (NO₃)</h3>
+          </div>
+          <p class="sol-desc">📈 Se acumula progresivamente si no se gestiona de forma periódica.</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Nivel NO₃ (mg/l)</th>
+                  <th>Impacto</th>
+                  <th>Solución</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0 – 20</td>
+                  <td><span class="badge badge-info">✅ Óptimo</span></td>
+                  <td>Rutina estándar</td>
+                </tr>
+                <tr>
+                  <td>20 – 50</td>
+                  <td><span class="badge badge-warning">⚠️ Aceptable</span></td>
+                  <td>Cambio 20% mensual</td>
+                </tr>
+                <tr>
+                  <td>50 – 100</td>
+                  <td><span class="badge badge-danger">❌ Alto</span></td>
+                  <td>Cambio 30% semanal + plantas</td>
+                </tr>
+                <tr>
+                  <td>&gt; 100</td>
+                  <td><span class="badge badge-danger">☠️ Peligroso</span></td>
+                  <td>Cambio 50% + reducir alimentación</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sol-block">
+            <h4>Métodos naturales (sin productos):</h4>
+            <div class="table-responsive">
+              <table class="sub-table highlight-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Efectividad</th>
+                    <th>Coste</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Plantas de crecimiento rápido (Hygrophila, Elodea, Cabomba)</td>
+                    <td>Alta</td>
+                    <td>Medio</td>
+                  </tr>
+                  <tr>
+                    <td>Refugio de macroalgas (Chaetomorpha, Caulerpa)</td>
+                    <td>Muy alta</td>
+                    <td>Bajo-Medio</td>
+                  </tr>
+                  <tr>
+                    <td>Técnica de carbono (vodka, azúcar, melaza)</td>
+                    <td>Alta</td>
+                    <td>Bajo</td>
+                  </tr>
+                  <tr>
+                    <td>Sustrato de madera/turba (ácidos húmicos + bacterias)</td>
+                    <td>Media</td>
+                    <td>Medio</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="sol-block">
+            <h4>Productos comerciales alternativos:</h4>
+            <ul>
+              <li><strong>Resinas:</strong> Seachem Purigen, Fluval Purification Cartridge.</li>
+              <li><strong>Bacterias desnitrificantes:</strong> Nitra-Shield (API), Nite-Out II (Seachem).</li>
+              <li><strong>Filtros:</strong> Filtros con medio anaeróbico (Ceramic rings, Bio-Balls).</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 4. Fosfatos -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">4</span>
+            <h3>FOSFATOS (PO₄)</h3>
+          </div>
+          <p class="sol-desc">🦠 Principal causante de la proliferación indeseada de algas.</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Nivel PO₄ (mg/l)</th>
+                  <th>Tipo Acuario</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0.0 – 0.1</td>
+                  <td>Salada</td>
+                  <td><span class="badge badge-info">✅ Ideal</span></td>
+                  <td>Mantener</td>
+                </tr>
+                <tr>
+                  <td>0.1 – 0.3</td>
+                  <td>Salada</td>
+                  <td><span class="badge badge-warning">⚠️ Aceptable</span></td>
+                  <td>Controlar</td>
+                </tr>
+                <tr>
+                  <td>&gt; 0.3</td>
+                  <td>Salada</td>
+                  <td><span class="badge badge-danger">❌ Alto</span></td>
+                  <td>Resinas + cambio agua</td>
+                </tr>
+                <tr>
+                  <td>0.0 – 1.0</td>
+                  <td>Dulce</td>
+                  <td><span class="badge badge-info">✅ Ideal</span></td>
+                  <td>Mantener</td>
+                </tr>
+                <tr>
+                  <td>&gt; 1.0</td>
+                  <td>Dulce</td>
+                  <td><span class="badge badge-danger">❌ Alto</span></td>
+                  <td>Reducir alimentación</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sol-block">
+            <h4>Protocolo de reducción en 7 días:</h4>
+            <div class="table-responsive">
+              <table class="sub-table timeline-table">
+                <thead>
+                  <tr>
+                    <th>Día</th>
+                    <th>Acción</th>
+                    <th>Resultado esperado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Día 1</strong></td>
+                    <td>Aspirar sustrato + limpiar filtro</td>
+                    <td>Eliminar fuente primaria</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Día 2</strong></td>
+                    <td>Cambio 25% agua</td>
+                    <td>Dilución inicial</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Día 3</strong></td>
+                    <td>Instalar resina fosfato</td>
+                    <td>Captura continua</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Día 4</strong></td>
+                    <td>Reducir iluminación 50%</td>
+                    <td>Limitar crecimiento algal</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Día 5</strong></td>
+                    <td>Alimentar 50% normal</td>
+                    <td>Menor entrada de PO₄</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Día 6</strong></td>
+                    <td>Medir nivel</td>
+                    <td>Ajustar estrategia</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Día 7</strong></td>
+                    <td>Cambio 25% + revisar resina</td>
+                    <td>Consolidar mejora</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="sol-block">
+            <h4>Productos alternativos:</h4>
+            <ul>
+              <li><strong>Resinas fosfato:</strong> Seachem Phosphate Adsorbent, Tropic Marin Phos-Clean.</li>
+              <li><strong>Skimmers:</strong> Eliminadores de proteína (agua salada).</li>
+              <li><strong>Sustratos reactivos:</strong> Sustratos con óxido de hierro.</li>
+            </ul>
+          </div>
+          <div class="sol-block">
+            <h4>Prevención natural:</h4>
+            <ul class="check-bullet-list">
+              <li>✓ Alimentos bajos en fosfato (ver etiqueta: &lt; 0.5%)</li>
+              <li>✓ Plantas absorbentes (Hygrophila, Vallisneria)</li>
+              <li>✓ No usar fertilizantes con fosfato en acuarios plantados</li>
+              <li>✓ Lavado previo de alimentos congelados</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 5. pH -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">5</span>
+            <h3>pH (Potencial de Hidrógeno)</h3>
+          </div>
+          <p class="sol-desc">⚖️ Relación crítica con KH (dureza de carbonatos).</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Tipo de Acuario</th>
+                  <th>Rango Óptimo</th>
+                  <th>Problemas Comunes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Agua dulce comunitario</td>
+                  <td>6.5 – 7.5</td>
+                  <td>Fluctuación por KH bajo</td>
+                </tr>
+                <tr>
+                  <td>Ciclídeos africanos</td>
+                  <td>7.8 – 8.5</td>
+                  <td>Difícil mantener bajo</td>
+                </tr>
+                <tr>
+                  <td>Agua salada</td>
+                  <td>8.0 – 8.4</td>
+                  <td>Caída nocturna por CO₂</td>
+                </tr>
+                <tr>
+                  <td>Peces sudamericanos</td>
+                  <td>5.5 – 6.5</td>
+                  <td>Requiere agua blanda</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="sol-block">
+            <h4>Subir pH (soluciones):</h4>
+            <div class="table-responsive">
+              <table class="sub-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Velocidad</th>
+                    <th>Duración</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Bicarbonato Na (1 tsp / 80L)</td>
+                    <td>Rápida (horas)</td>
+                    <td>Requiere repetición</td>
+                  </tr>
+                  <tr>
+                    <td>Coral triturado en filtro</td>
+                    <td>Lenta (días)</td>
+                    <td>Permanente</td>
+                  </tr>
+                  <tr>
+                    <td>Piedra caliza (Limestone)</td>
+                    <td>Muy lenta</td>
+                    <td>Permanente</td>
+                  </tr>
+                  <tr>
+                    <td>Buffer alcalino comercial</td>
+                    <td>Instantánea</td>
+                    <td>2-3 días</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sol-block">
+            <h4>Bajar pH (soluciones):</h4>
+            <div class="table-responsive">
+              <table class="sub-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Velocidad</th>
+                    <th>Duración</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Agua RO / destilada (mezcla gradual)</td>
+                    <td>Rápida</td>
+                    <td>Según proporción</td>
+                  </tr>
+                  <tr>
+                    <td>Turba / Super Peat en filtro</td>
+                    <td>Media (semanas)</td>
+                    <td>1-2 semanas</td>
+                  </tr>
+                  <tr>
+                    <td>Madera (Mopani)</td>
+                    <td>Lenta</td>
+                    <td>Permanente</td>
+                  </tr>
+                  <tr>
+                    <td>Acid Buffer comercial</td>
+                    <td>Instantánea</td>
+                    <td>2-3 días</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="warning-callout">
+            <strong>⚠️ ADVERTENCIAS CRÍTICAS:</strong>
+            <ul>
+              <li>❗ NUNCA ajustes el pH más de 0.5 unidades por día.</li>
+              <li>❗ Primero estabiliza el KH antes de modificar el pH.</li>
+              <li>❗ Los cambios bruscos matan más que un valor no perfecto.</li>
+              <li>❗ Peces muertos = falla en la osmorregulación, no por el pH en sí.</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 6. GH y KH -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">6</span>
+            <h3>DUREZA TOTAL (GH) y DUREZA DE CARBONATOS (KH)</h3>
+          </div>
+          <p class="sol-desc">🔒 El KH actúa como el amortiguador (buffer) principal del pH.</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Mínimo recomendado</th>
+                  <th>Óptimo</th>
+                  <th>Máximo seguro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>KH</strong></td>
+                  <td>5° dKH</td>
+                  <td>5 - 10° dKH</td>
+                  <td>20° dKH</td>
+                </tr>
+                <tr>
+                  <td><strong>GH</strong></td>
+                  <td>4° dGH</td>
+                  <td>6 - 12° dGH</td>
+                  <td>20° dGH</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="sol-block">
+            <h4>Aumentar KH / GH:</h4>
+            <div class="table-responsive">
+              <table class="sub-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Dosificación</th>
+                    <th>Efecto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Bicarbonato de sodio</td>
+                    <td>1 cucharadita / 80L</td>
+                    <td>↑ KH solamente</td>
+                  </tr>
+                  <tr>
+                    <td>Cloruro de calcio</td>
+                    <td>1g / 100L</td>
+                    <td>↑ GH solamente</td>
+                  </tr>
+                  <tr>
+                    <td>Carbonato de calcio</td>
+                    <td>Según producto</td>
+                    <td>↑ KH + GH</td>
+                  </tr>
+                  <tr>
+                    <td>Piedras calcáreas</td>
+                    <td>En filtro / sustrato</td>
+                    <td>↑↑ lento y estable</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sol-block">
+            <h4>Reducir KH / GH:</h4>
+            <div class="table-responsive">
+              <table class="sub-table">
+                <thead>
+                  <tr>
+                    <th>Método</th>
+                    <th>Proporción</th>
+                    <th>Tiempo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Agua de ósmosis</td>
+                    <td>50:50 con agua del grifo</td>
+                    <td>Inmediato</td>
+                  </tr>
+                  <tr>
+                    <td>Turba en filtro</td>
+                    <td>Bolsa con turba</td>
+                    <td>1-2 semanas</td>
+                  </tr>
+                  <tr>
+                    <td>Resina desmineralizante</td>
+                    <td>En filtro externo</td>
+                    <td>Gradual</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+        <!-- 7. Hierro -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">7</span>
+            <h3>HIERRO (Fe)</h3>
+          </div>
+          <p class="sol-desc">🌿 Nutriente esencial para las plantas pero tóxico en exceso.</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Nivel Fe (mg/l)</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0.0</td>
+                  <td><span class="badge badge-warning">⚠️ Deficiencia grave</span></td>
+                  <td>Fertilizar inmediatamente</td>
+                </tr>
+                <tr>
+                  <td>0.1 – 0.25</td>
+                  <td><span class="badge badge-warning">🟡 Bajo</span></td>
+                  <td>Abonar en 3-5 días</td>
+                </tr>
+                <tr>
+                  <td>0.5</td>
+                  <td><span class="badge badge-info">✅ Ideal plantas</span></td>
+                  <td>Mantener con fertilización</td>
+                </tr>
+                <tr>
+                  <td>&gt; 0.5</td>
+                  <td><span class="badge badge-danger">❌ Tóxico peces</span></td>
+                  <td>Cambio parcial de agua</td>
+                </tr>
+                <tr>
+                  <td>&gt; 1.0</td>
+                  <td><span class="badge badge-danger">☠️ Peligroso</span></td>
+                  <td>Cambio 50% + eliminar fuente</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sol-block">
+            <h4>Fuentes seguras de hierro:</h4>
+            <ul>
+              <li>Fertilizantes líquidos equilibrados (Seachem Flourish, ADA Eco-Complete).</li>
+              <li>Pastillas en sustrato (para raíces de plantas).</li>
+              <li><strong>Evitar:</strong> Agua del grifo no tratada (puede contener hierro inorgánico nocivo).</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 9. Cloro -->
+        <article class="guide-card solution-detail-card">
+          <div class="sol-card-header">
+            <span class="sol-num">9</span>
+            <h3>CLORO / CLORAMINAS (Cl)</h3>
+          </div>
+          <p class="sol-desc">💥 Destruye las bacterias del filtro y daña gravemente las branquias.</p>
+          <div class="table-responsive">
+            <table class="sub-table">
+              <thead>
+                <tr>
+                  <th>Nivel Cl (mg/l)</th>
+                  <th>Detección</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>0.0</td>
+                  <td>Sin color</td>
+                  <td><span class="badge badge-info">✅ Seguro</span></td>
+                </tr>
+                <tr>
+                  <td>≥ 0.02</td>
+                  <td>Amarillento</td>
+                  <td><span class="badge badge-warning">Acondicionador inmediato</span></td>
+                </tr>
+                <tr>
+                  <td>≥ 0.1</td>
+                  <td>Amarillo-rojizo</td>
+                  <td><span class="badge badge-danger">Cambio 50% + acondicionador</span></td>
+                </tr>
+                <tr>
+                  <td>≥ 0.5</td>
+                  <td>Rojo intenso</td>
+                  <td><span class="badge badge-danger">Cambio total + evacuar peces</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="sol-block">
+            <h4>Protocolo de emergencia:</h4>
+            <ol class="emergency-steps">
+              <li><strong>MEDIR:</strong> Confirmar presencia de cloro.</li>
+              <li><strong>DESINTOXICAR:</strong> Acondicionador según dosis (doblar si &gt;0.1 mg/l).</li>
+              <li><strong>ESPERAR:</strong> 15-30 min para neutralización.</li>
+              <li><strong>CAMBIAR:</strong> 30-50% del agua.</li>
+              <li><strong>PREVENIR:</strong> Dejar reposar agua nueva 24h SIN cloro.</li>
+            </ol>
+          </div>
+          <div class="sol-block">
+            <h4>Prevención (agua del grifo):</h4>
+            <ul>
+              <li>Reposo 24-48 horas en recipiente abierto (evapora cloro, no cloramina).</li>
+              <li>Acondicionador químico siempre (elimina cloro Y cloramina).</li>
+              <li>Sistema de ósmosis + remineralización (elimina todo contaminante).</li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Checklist de Diagnóstico Rápido -->
+      <div id="diagnostico" class="guide-card diagnostic-card">
+        <div class="card-header">
+          <h2>🔄 Checklist de Diagnóstico Rápido</h2>
+        </div>
+        <p class="diag-intro">Antes de aplicar cualquier solución química, verifica estos puntos clave:</p>
+        <ul class="diag-checklist">
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿He medido múltiples parámetros correlacionados? (pH + KH + NH₃)</span>
+            </label>
+          </li>
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿El test está caducado o es preciso?</span>
+            </label>
+          </li>
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿Hay peces o muertes recientes sin detectar?</span>
+            </label>
+          </li>
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿He sobrealimentado en los últimos días?</span>
+            </label>
+          </li>
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿El filtro está limpio pero no esterilizado?</span>
+            </label>
+          </li>
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿La nueva agua tiene parámetros similares a los del acuario?</span>
+            </label>
+          </li>
+          <li>
+            <label class="diag-item">
+              <input type="checkbox" />
+              <span>¿Hay fuentes externas de contaminación? (tuberías, medicamentos)</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+
+    </section>
+
+    <!-- Navegación inferior -->
+    <footer class="nav-wrapper">
+      <nav class="book-nav">
+        <a href={BASE} data-astro-reload>← Volver al Libro</a>
+        <a href={`${BASE}water-levels`} data-astro-reload>💧 Niveles de agua</a>
+      </nav>
+    </footer>
+
+  </div>
+</FullPageLayout>
